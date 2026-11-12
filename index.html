@@ -44,52 +44,53 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 
 <div id="authScreen" class="card" style="max-width: 400px; margin: 40px auto;">
   <h2 style="margin-top:0; text-align:center;">🚌 Вход в журнал</h2>
+  <div id="verStatus" style="text-align:center; font-size:12px; color:#888; margin-bottom:10px;">Версия 8 (загрузка...)</div>
   <input id="uLog" type="text" placeholder="Логин (по умолчанию: admin)">
   <input id="uPass" type="password" placeholder="Пароль (по умолчанию: 1234)">
-  <button type="button" class="btn" onclick="doLogin()">Войти</button>
-  <button type="button" class="btn bg" onclick="doReg()">Зарегистрировать нового пользователя</button>
+  <button type="button" id="btnLogin" class="btn">Войти</button>
+  <button type="button" id="btnReg" class="btn bg">Зарегистрировать нового пользователя</button>
 </div>
 
 <div id="appScreen" style="display:none;">
   <div class="topbar">
     <span>👤 Пользователь: <b id="curUserName"></b></span>
-    <button type="button" onclick="doLogout()" style="border:0; background:#e5e5ea; padding:5px 10px; border-radius:6px; font-weight:bold;">Выйти</button>
+    <button type="button" id="btnLogout" style="border:0; background:#e5e5ea; padding:5px 10px; border-radius:6px; font-weight:bold;">Выйти</button>
   </div>
 
   <div class="nav">
-    <button type="button" id="b1" onclick="tab(1)">Настройка</button>
-    <button type="button" id="b5" onclick="tab(5)">База</button>
-    <button type="button" id="b2" class="act" onclick="tab(2)">Поездка</button>
-    <button type="button" id="b3" onclick="tab(3)">Отчет</button>
-    <button type="button" id="b4" onclick="tab(4)">Архив</button>
+    <button type="button" id="b1">Настройка</button>
+    <button type="button" id="b5">База</button>
+    <button type="button" id="b2" class="act">Поездка</button>
+    <button type="button" id="b3">Отчет</button>
+    <button type="button" id="b4">Архив</button>
   </div>
 
   <div id="t1" class="pg">
     <div class="card">
       <b>🚏 Остановки</b>
       <input id="inS" placeholder="Название остановки" style="margin-top:8px;">
-      <button type="button" class="btn" onclick="addS()">+ Добавить остановку</button>
+      <button type="button" id="btnAddS" class="btn">+ Добавить остановку</button>
       <div id="lS"></div>
     </div>
     <div class="card">
       <b>🔄 Рейсы</b>
       <input id="inR" placeholder="Название рейса" style="margin-top:8px;">
-      <button type="button" class="btn" onclick="addR()">+ Добавить рейс</button>
+      <button type="button" id="btnAddR" class="btn">+ Добавить рейс</button>
       <div id="lR"></div>
     </div>
     <div class="card">
       <b>👥 Пользователи (логин и пароль)</b>
       <input id="nUL" placeholder="Новый логин" style="margin-top:8px;">
       <input id="nUP" placeholder="Новый пароль">
-      <button type="button" class="btn bg" onclick="addUser()">+ Добавить пользователя</button>
+      <button type="button" id="btnAddU" class="btn bg">+ Добавить пользователя</button>
       <div id="lU" style="margin-top:8px;"></div>
     </div>
     <div class="card">
       <b>☁️ Перенос данных на другое устройство</b>
       <p style="font-size:13px; color:#666; margin:6px 0;">Нажмите «Создать код», скопируйте его и вставьте на другом телефоне или компьютере, чтобы перенести всю базу, пользователей и архив.</p>
       <textarea id="syncBox" rows="3" placeholder="Здесь появится код для переноса или вставьте сюда код с другого устройства..."></textarea>
-      <button type="button" class="btn bp" onclick="exportData()">1. Создать код для переноса</button>
-      <button type="button" class="btn bg" onclick="importData()">2. Загрузить данные из кода</button>
+      <button type="button" id="btnExp" class="btn bp">1. Создать код для переноса</button>
+      <button type="button" id="btnImp" class="btn bg">2. Загрузить данные из кода</button>
     </div>
   </div>
 
@@ -98,7 +99,7 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
       <b>👶 База учеников</b>
       <input id="inBK" placeholder="ФИО ученика" style="margin-top:8px;">
       <input id="inBP" placeholder="Телефон родителей">
-      <button type="button" class="btn bg" onclick="addBase()">+ Сохранить в базу</button>
+      <button type="button" id="btnAddB" class="btn bg">+ Сохранить в базу</button>
       <div id="lB" style="margin-top:10px;"></div>
     </div>
   </div>
@@ -106,24 +107,24 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
   <div id="t2" class="pg act">
     <div class="clk" id="clk"></div>
     <div class="card">
-      Рейс: <select id="rt" onchange="setR(this.value)"></select>
-      Текущая остановка: <select id="st" onchange="setS(this.value)"></select>
+      Рейс: <select id="rt"></select>
+      Текущая остановка: <select id="st"></select>
     </div>
     <div class="card">
       <b>Добавить ученика на этот рейс:</b>
       <select id="selB" style="margin-top:6px;"></select>
-      <button type="button" class="btn bg" onclick="addFromBase()">+ Добавить в поездку</button>
+      <button type="button" id="btnAddFB" class="btn bg">+ Добавить в поездку</button>
     </div>
     <div id="trip"></div>
-    <button type="button" class="btn bo" onclick="clr()">Сбросить отметки этого рейса</button>
+    <button type="button" id="btnClr" class="btn bo">Сбросить отметки этого рейса</button>
   </div>
 
   <div id="t3" class="pg">
     <div id="rep"></div>
     <div class="no-print">
-      <button type="button" class="btn bd" onclick="window.print()">🖨️ Печать на принтер</button>
-      <button type="button" class="btn bp" onclick="toArch()">💾 Сохранить в Архив</button>
-      <button type="button" class="btn bg" onclick="cp()">📋 Скопировать текстом</button>
+      <button type="button" id="btnPrint" class="btn bd">🖨️ Печать на принтер</button>
+      <button type="button" id="btnArch" class="btn bp">💾 Сохранить в Архив</button>
+      <button type="button" id="btnCopy" class="btn bg">📋 Скопировать текстом</button>
     </div>
   </div>
 
@@ -135,6 +136,14 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 <div id="toast" class="msg"></div>
 
 <script>
+window.onerror = function(msg, url, line) {
+  var st = document.getElementById("verStatus");
+  if (st) {
+    st.textContent = "Ошибка: " + msg + " (стр. " + line + ")";
+    st.style.color = "red";
+  }
+};
+
 var db = {
   users: new Array({ l: "admin", p: "1234" }),
   curUser: null,
@@ -148,7 +157,7 @@ var db = {
 };
 
 try {
-  var saved = localStorage.getItem("bus_gh_v7");
+  var saved = localStorage.getItem("bus_gh_v8");
   if (saved) {
     var p = JSON.parse(saved);
     if (p.users) db.users = p.users;
@@ -180,7 +189,7 @@ function notify(txt) {
 }
 
 function sv() {
-  try { localStorage.setItem("bus_gh_v7", JSON.stringify(db)); } catch (e) {}
+  try { localStorage.setItem("bus_gh_v8", JSON.stringify(db)); } catch (e) {}
   if (db.curUser) drw();
 }
 
@@ -215,7 +224,7 @@ function checkAuth() {
   }
 }
 
-function doLogin() {
+document.getElementById("btnLogin").addEventListener("click", function() {
   var l = document.getElementById("uLog").value.trim();
   var p = document.getElementById("uPass").value.trim();
   var found = false;
@@ -229,9 +238,9 @@ function doLogin() {
   } else {
     notify("Неверный логин или пароль (по умолчанию: admin / 1234)");
   }
-}
+});
 
-function doReg() {
+document.getElementById("btnReg").addEventListener("click", function() {
   var l = document.getElementById("uLog").value.trim();
   var p = document.getElementById("uPass").value.trim();
   if (!l || !p) { notify("Введите новый логин и пароль в поля выше"); return; }
@@ -245,10 +254,5 @@ function doReg() {
   sv();
   checkAuth();
   notify("Пользователь создан!");
-}
+});
 
-function addUser() {
-  var l = document.getElementById("nUL").value.trim();
-  var p = document.getElementById("nUP").value.trim();
-  if (!l || !p) { notify("Введите логин и пароль"); return; }
-  var exists = false;
