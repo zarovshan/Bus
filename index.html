@@ -21,7 +21,7 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 .br { background: #ff3b30; }
 .bp { background: #5856d6; }
 .bd { background: #1c1c1e; }
-.tag { display: inline-block; background: #e5e5ea; padding: 6px 10px; border-radius: 6px; margin: 3px; font-size: 14px; }
+.tag { display: inline-flex; align-items: center; gap: 6px; background: #e5e5ea; padding: 6px 10px; border-radius: 6px; margin: 3px; font-size: 14px; }
 .kid { background: #fff; padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid #ccc; }
 .kid.in { border-left-color: #34c759; background: #f0fdf4; }
 .kid.out { border-left-color: #007aff; background: #f0f7ff; }
@@ -30,6 +30,8 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 .kbtns button { flex: 1; padding: 10px; border: 0; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
 .clk { background: #007aff15; color: #007aff; padding: 8px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 10px; }
 .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; color: #555; }
+.row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #eee; }
+.del-x { color: #ff3b30; font-weight: bold; cursor: pointer; padding: 2px 6px; }
 .msg { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 14px; display: none; z-index: 999; text-align: center; }
 @media print {
   .nav, .no-print, .topbar, .clk, .msg { display: none !important; }
@@ -44,7 +46,7 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 
 <div id="authScreen" class="card" style="max-width: 400px; margin: 40px auto;">
   <h2 style="margin-top:0; text-align:center;">🚌 Вход в журнал</h2>
-  <div id="verStatus" style="text-align:center; font-size:13px; font-weight:bold; color:#ff9500; margin-bottom:10px;">Версия 11 (ожидание...)</div>
+  <div id="verStatus" style="text-align:center; font-size:13px; font-weight:bold; color:#ff9500; margin-bottom:10px;">Версия 12 (загрузка...)</div>
   <input id="uLog" type="text" placeholder="Логин (по умолчанию: admin)">
   <input id="uPass" type="password" placeholder="Пароль (по умолчанию: 1234)">
   <button type="button" id="btnLogin" class="btn">Войти</button>
@@ -87,8 +89,7 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
     </div>
     <div class="card">
       <b>☁️ Перенос данных на другое устройство</b>
-      <p style="font-size:13px; color:#666; margin:6px 0;">Нажмите «Создать код», скопируйте его и вставьте на другом телефоне или компьютере, чтобы перенести всю базу, пользователей и архив.</p>
-      <textarea id="syncBox" rows="3" placeholder="Здесь появится код для переноса или вставьте сюда код с другого устройства..."></textarea>
+      <textarea id="syncBox" rows="3" placeholder="Код для переноса..."></textarea>
       <button type="button" id="btnExp" class="btn bp">1. Создать код для переноса</button>
       <button type="button" id="btnImp" class="btn bg">2. Загрузить данные из кода</button>
     </div>
@@ -136,14 +137,6 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 <div id="toast" class="msg"></div>
 
 <script>
-window.onerror = function(msg, url, line) {
-  var st = document.getElementById("verStatus");
-  if (st) {
-    st.textContent = "Ошибка: " + msg + " (стр. " + line + ")";
-    st.style.color = "red";
-  }
-};
-
 var db = {
   users: new Array({ l: "admin", p: "1234" }),
   curUser: null,
@@ -157,35 +150,25 @@ var db = {
 };
 
 try {
-  var saved = localStorage.getItem("bus_gh_v11");
-  if (saved) {
-    var p = JSON.parse(saved);
-    if (p.users) db.users = p.users;
-    if (p.curUser) db.curUser = p.curUser;
-    if (p.s) db.s = p.s;
-    if (p.r) db.r = p.r;
-    if (p.b) db.b = p.b;
-    if (p.k) db.k = p.k;
-    if (p.a) db.a = p.a;
-    if (p.cr) db.cr = p.cr;
-    if (p.cs) db.cs = p.cs;
-  }
+  var saved = localStorage.getItem("bus_gh_v12");
+  if (saved) Object.assign(db, JSON.parse(saved));
 } catch (e) {}
 
-function getByIdx(arr, idx) {
-  var found = null;
-  arr.forEach(function(item, i) {
-    if (i === idx) found = item;
-  });
-  return found;
+function el(id) { return document.getElementById(id); }
+
+function mkNode(tag, cls, txt) {
+  var node = document.createElement(tag);
+  if (cls) node.className = cls;
+  if (txt !== undefined) node.textContent = txt;
+  return node;
 }
 
 function notify(txt) {
-  var el = document.getElementById("toast");
-  if (!el) return;
-  el.textContent = txt;
-  el.style.display = "block";
-  setTimeout(function() { el.style.display = "none"; }, 2500);
+  var box = el("toast");
+  if (!box) return;
+  box.textContent = txt;
+  box.style.display = "block";
+  setTimeout(function() { box.style.display = "none"; }, 2500);
 }
 
 function pad2(n) { return n < 10 ? "0" + n : "" + n; }
@@ -193,56 +176,71 @@ function gD() { var n = new Date(); return pad2(n.getDate()) + "." + pad2(n.getM
 function gT() { var n = new Date(); return pad2(n.getHours()) + ":" + pad2(n.getMinutes()); }
 
 setInterval(function() {
-  var el = document.getElementById("clk");
-  if (el) el.textContent = "📅 " + gD() + "   🕒 " + gT();
+  var c = el("clk");
+  if (c) c.textContent = "📅 " + gD() + "   🕒 " + gT();
 }, 1000);
 
 function sv() {
-  try { localStorage.setItem("bus_gh_v11", JSON.stringify(db)); } catch (e) {}
+  try { localStorage.setItem("bus_gh_v12", JSON.stringify(db)); } catch (e) {}
   if (db.curUser) drw();
 }
 
 function checkAuth() {
   if (db.curUser) {
-    document.getElementById("authScreen").style.display = "none";
-    document.getElementById("appScreen").style.display = "block";
-    document.getElementById("curUserName").textContent = db.curUser;
+    el("authScreen").style.display = "none";
+    el("appScreen").style.display = "block";
+    el("curUserName").textContent = db.curUser;
     drw();
   } else {
-    document.getElementById("authScreen").style.display = "block";
-    document.getElementById("appScreen").style.display = "none";
+    el("authScreen").style.display = "block";
+    el("appScreen").style.display = "none";
   }
 }
 
-document.getElementById("btnLogin").onclick = function() {
-  var l = document.getElementById("uLog").value.trim();
-  var p = document.getElementById("uPass").value.trim();
+el("btnLogin").onclick = function() {
+  var l = el("uLog").value.trim();
+  var p = el("uPass").value.trim();
   var ok = false;
-  db.users.forEach(function(u) {
-    if (u.l === l && u.p === p) ok = true;
-  });
-  if (ok) {
-    db.curUser = l;
-    sv();
-    checkAuth();
-  } else {
-    notify("Неверный логин или пароль (по умолчанию: admin / 1234)");
-  }
+  db.users.forEach(function(u) { if (u.l === l && u.p === p) ok = true; });
+  if (ok) { db.curUser = l; sv(); checkAuth(); }
+  else { notify("Неверный логин или пароль (admin / 1234)"); }
 };
 
-document.getElementById("btnReg").onclick = function() {
-  var l = document.getElementById("uLog").value.trim();
-  var p = document.getElementById("uPass").value.trim();
-  if (!l || !p) { notify("Введите новый логин и пароль в поля выше"); return; }
-  var exists = false;
-  db.users.forEach(function(u) {
-    if (u.l === l) exists = true;
-  });
-  if (exists) { notify("Такой логин уже занят"); return; }
+el("btnReg").onclick = function() {
+  var l = el("uLog").value.trim();
+  var p = el("uPass").value.trim();
+  if (!l || !p) { notify("Введите логин и пароль"); return; }
+  var ex = false;
+  db.users.forEach(function(u) { if (u.l === l) ex = true; });
+  if (ex) { notify("Логин занят"); return; }
   db.users.push({ l: l, p: p });
   db.curUser = l;
   sv();
   checkAuth();
   notify("Пользователь создан!");
+};
+
+el("btnLogout").onclick = function() { db.curUser = null; sv(); checkAuth(); };
+
+function tab(n) {
+  for (var i = 1; i <= 5; i++) {
+    el("t" + i).className = (i === n) ? "pg act" : "pg";
+    el("b" + i).className = (i === n) ? "act" : "";
+  }
+  drw();
+}
+
+el("b1").onclick = function() { tab(1); };
+el("b2").onclick = function() { tab(2); };
+el("b3").onclick = function() { tab(3); };
+el("b4").onclick = function() { tab(4); };
+el("b5").onclick = function() { tab(5); };
+
+el("rt").onchange = function() { db.cr = this.value; sv(); };
+el("st").onchange = function() { db.cs = this.value; sv(); };
+
+el("btnAddS").onclick = function() {
+  var v = el("inS").value.trim();
+  if (v) { db.s.push(v); db.cs = v; el("inS").value = ""; sv(); notify("Остановка добавлена"); }
 };
 
