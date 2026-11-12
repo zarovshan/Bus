@@ -44,7 +44,7 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 
 <div id="authScreen" class="card" style="max-width: 400px; margin: 40px auto;">
   <h2 style="margin-top:0; text-align:center;">🚌 Вход в журнал</h2>
-  <div id="verStatus" style="text-align:center; font-size:13px; font-weight:bold; color:#ff9500; margin-bottom:10px;">Версия 9 (ожидание...)</div>
+  <div id="verStatus" style="text-align:center; font-size:13px; font-weight:bold; color:#ff9500; margin-bottom:10px;">Версия 10 (ожидание...)</div>
   <input id="uLog" type="text" placeholder="Логин (по умолчанию: admin)">
   <input id="uPass" type="password" placeholder="Пароль (по умолчанию: 1234)">
   <button type="button" id="btnLogin" class="btn">Войти</button>
@@ -137,19 +137,19 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 
 <script>
 var db = {
-  users: [{ l: "admin", p: "1234" }],
+  users: new Array({ l: "admin", p: "1234" }),
   curUser: null,
-  s: ["Остановка 1", "Школа"],
-  r: ["Утро", "Вечер"],
-  b: [],
-  k: [],
-  a: [],
+  s: new Array("Остановка 1", "Школа"),
+  r: new Array("Утро", "Вечер"),
+  b: new Array(),
+  k: new Array(),
+  a: new Array(),
   cr: "Утро",
   cs: "Остановка 1"
 };
 
 try {
-  var saved = localStorage.getItem("bus_gh_v9");
+  var saved = localStorage.getItem("bus_gh_v10");
   if (saved) {
     var p = JSON.parse(saved);
     if (p.users) db.users = p.users;
@@ -164,6 +164,14 @@ try {
   }
 } catch (e) {}
 
+function getByIdx(arr, idx) {
+  var found = null;
+  arr.forEach(function(item, i) {
+    if (i === idx) found = item;
+  });
+  return found;
+}
+
 function notify(txt) {
   var el = document.getElementById("toast");
   if (!el) return;
@@ -172,9 +180,18 @@ function notify(txt) {
   setTimeout(function() { el.style.display = "none"; }, 2500);
 }
 
+function pad2(n) { return n < 10 ? "0" + n : "" + n; }
+function gD() { var n = new Date(); return pad2(n.getDate()) + "." + pad2(n.getMonth() + 1) + "." + n.getFullYear(); }
+function gT() { var n = new Date(); return pad2(n.getHours()) + ":" + pad2(n.getMinutes()); }
+
+setInterval(function() {
+  var el = document.getElementById("clk");
+  if (el) el.textContent = "📅 " + gD() + "   🕒 " + gT();
+}, 1000);
+
 function sv() {
-  try { localStorage.setItem("bus_gh_v9", JSON.stringify(db)); } catch (e) {}
-  if (db.curUser && typeof drw === "function") drw();
+  try { localStorage.setItem("bus_gh_v10", JSON.stringify(db)); } catch (e) {}
+  if (db.curUser) drw();
 }
 
 function checkAuth() {
@@ -182,7 +199,7 @@ function checkAuth() {
     document.getElementById("authScreen").style.display = "none";
     document.getElementById("appScreen").style.display = "block";
     document.getElementById("curUserName").textContent = db.curUser;
-    if (typeof drw === "function") drw();
+    drw();
   } else {
     document.getElementById("authScreen").style.display = "block";
     document.getElementById("appScreen").style.display = "none";
@@ -193,9 +210,9 @@ document.getElementById("btnLogin").onclick = function() {
   var l = document.getElementById("uLog").value.trim();
   var p = document.getElementById("uPass").value.trim();
   var ok = false;
-  for (var i = 0; i < db.users.length; i++) {
-    if (db.users[i].l === l && db.users[i].p === p) ok = true;
-  }
+  db.users.forEach(function(u) {
+    if (u.l === l && u.p === p) ok = true;
+  });
   if (ok) {
     db.curUser = l;
     sv();
@@ -209,9 +226,11 @@ document.getElementById("btnReg").onclick = function() {
   var l = document.getElementById("uLog").value.trim();
   var p = document.getElementById("uPass").value.trim();
   if (!l || !p) { notify("Введите новый логин и пароль в поля выше"); return; }
-  for (var i = 0; i < db.users.length; i++) {
-    if (db.users[i].l === l) { notify("Такой логин уже занят"); return; }
-  }
+  var exists = false;
+  db.users.forEach(function(u) {
+    if (u.l === l) exists = true;
+  });
+  if (exists) { notify("Такой логин уже занят"); return; }
   db.users.push({ l: l, p: p });
   db.curUser = l;
   sv();
@@ -225,24 +244,6 @@ document.getElementById("btnLogout").onclick = function() {
   checkAuth();
 };
 
-var stEl = document.getElementById("verStatus");
-if (stEl) {
-  stEl.textContent = "Версия 9 (готова к работе)";
-  stEl.style.color = "#34c759";
-}
-checkAuth();
-</script>
-
-<script>
-function pad2(n) { return n < 10 ? "0" + n : "" + n; }
-function gD() { var n = new Date(); return pad2(n.getDate()) + "." + pad2(n.getMonth() + 1) + "." + n.getFullYear(); }
-function gT() { var n = new Date(); return pad2(n.getHours()) + ":" + pad2(n.getMinutes()); }
-
-setInterval(function() {
-  var el = document.getElementById("clk");
-  if (el) el.textContent = "📅 " + gD() + "   🕒 " + gT();
-}, 1000);
-
 function tab(n) {
-  var list =;
-  for (var idx = 0; idx < list.length; idx++) {
+  for (var i = 1; i <= 5; i++) {
+    document.getElementById("t" + i).className = (i === n) ? "pg act" : "pg";
