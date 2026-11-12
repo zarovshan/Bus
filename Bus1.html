@@ -1,1 +1,254 @@
-<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Журнал</title><style>*{box-sizing:border-box}body{font-family:sans-serif;background:#f2f2f7;margin:0;padding:12px 12px 80px}.nav{display:flex;background:#e5e5ea;border-radius:10px;padding:4px;margin-bottom:12px;gap:3px}.nav button{flex:1;padding:10px 2px;border:0;border-radius:8px;background:transparent;font-size:12px;font-weight:bold;color:#666}.nav button.act{background:#fff;color:#007aff}.pg{display:none}.pg.act{display:block}.card{background:#fff;padding:12px;border-radius:10px;margin-bottom:10px}input,select,textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:16px;margin-bottom:8px;background:#fff}.btn{width:100%;padding:12px;border:0;border-radius:8px;font-size:15px;font-weight:bold;color:#fff;background:#007aff;margin-bottom:6px}.bg{background:#34c759}.bo{background:#ff9500}.br{background:#ff3b30}.bp{background:#5856d6}.bd{background:#1c1c1e}.tag{display:inline-block;background:#e5e5ea;padding:5px 8px;border-radius:6px;margin:3px}.kid{background:#fff;padding:12px;border-radius:10px;margin-bottom:8px;border-left:5px solid #ccc}.kid.in{border-left-color:#34c759;background:#f0fdf4}.kid.out{border-left-color:#007aff;background:#f0f7ff}.kid.abs{border-left-color:#ff3b30;background:#fef2f2}.kbtns{display:flex;gap:6px;margin-top:8px}.kbtns button{flex:1;padding:10px;border:0;border-radius:6px;color:#fff;font-weight:bold}.clk{background:#007aff15;color:#007aff;padding:8px;border-radius:8px;font-weight:bold;text-align:center;margin-bottom:10px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px}@media print{.nav,.np,.top,.clk{display:none!important}body{background:#fff;padding:0}.pg{display:none!important}#t3{display:block!important}}</style></head><body><div id="auth" class="card" style="max-width:400px;margin:30px auto"><h3 style="margin-top:0;text-align:center">Вход в журнал</h3><input id="uL" placeholder="Логин (admin)"><input id="uP" type="password" placeholder="Пароль (1234)"><button class="btn" onclick="lgn()">Войти</button><button class="btn bg" onclick="reg()">Регистрация</button></div><div id="app" style="display:none"><div class="top"><span>Пользователь: <b id="cU"></b></span><button onclick="out()" style="border:0;background:#e5e5ea;padding:5px 10px;border-radius:6px">Выйти</button></div><div class="nav"><button id="b1" onclick="tab(1)">Настройка</button><button id="b5" onclick="tab(5)">База</button><button id="b2" class="act" onclick="tab(2)">Поездка</button><button id="b3" onclick="tab(3)">Отчет</button><button id="b4" onclick="tab(4)">Архив</button></div><div id="t1" class="pg"><div class="card"><b>Остановки</b><input id="inS" placeholder="Название"><button class="btn" onclick="addS()">+ Остановка</button><div id="lS"></div></div><div class="card"><b>Рейсы</b><input id="inR" placeholder="Название"><button class="btn" onclick="addR()">+ Рейс</button><div id="lR"></div></div><div class="card"><b>Перенос данных</b><textarea id="sBox" rows="2" placeholder="Код для переноса..."></textarea><button class="btn bp" onclick="exp()">1. Создать код</button><button class="btn bg" onclick="imp()">2. Загрузить из кода</button></div></div><div id="t5" class="pg"><div class="card"><b>База учеников</b><input id="inBK" placeholder="ФИО"><input id="inBP" placeholder="Телефон"><button class="btn bg" onclick="addB()">+ В базу</button><div id="lB"></div></div></div><div id="t2" class="pg act"><div class="clk" id="clk"></div><div class="card">Рейс:<select id="rt" onchange="db.cr=this.value;sv()"></select>Остановка:<select id="st" onchange="db.cs=this.value;sv()"></select></div><div class="card"><b>Выбрать из базы:</b><select id="selB"></select><button class="btn bg" onclick="addFB()">+ В поездку</button></div><div id="trip"></div><button class="btn bo" onclick="clr()">Сбросить отметки</button></div><div id="t3" class="pg"><div id="rep"></div><div class="np"><button class="btn bd" onclick="window.print()">Печать</button><button class="btn bp" onclick="toArch()">В Архив</button><button class="btn bg" onclick="cp()">Копировать</button></div></div><div id="t4" class="pg"><div id="arch"></div></div></div><script>var db={u:{admin:'1234'},cu:null,s:['Остановка 1','Школа'],r:['Утро','Вечер'],b:[],k:[],a:[],cr:'Утро',cs:'Остановка 1'};try{var x=localStorage.getItem('b_ru4');if(x)Object.assign(db,JSON.parse(x))}catch(e){}function sv(){try{localStorage.setItem('b_ru4',JSON.stringify(db))}catch(e){}if(db.cu)drw()}function gD(){var n=new Date();return String(n.getDate()).padStart(2,'0')+'.'+String(n.getMonth()+1).padStart(2,'0')+'.'+n.getFullYear()}function gT(){var n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')}setInterval(function(){var e=document.getElementById('clk');if(e)e.textContent=gD()+' '+gT()},1000);function chk(){document.getElementById('auth').style.display=db.cu?'none':'block';document.getElementById('app').style.display=db.cu?'block':'none';if(db.cu){document.getElementById('cU').textContent=db.cu;drw()}}function lgn(){var l=document.getElementById('uL').value.trim(),p=document.getElementById('uP').value.trim();if(db.u[l]===p){db.cu=l;sv();chk()}else alert('Неверно (admin / 1234)')}function reg(){var l=document.getElementById('uL').value.trim(),p=document.getElementById('uP').value.trim();if(!l||!p)return alert('Введите логин и пароль');if(db.u[l])return alert('Логин занят');db.u[l]=p;db.cu=l;sv();chk()}function out(){db.cu=null;sv();chk()}function tab(n){[1,2,3,4,5].forEach(function(i){document.getElementById('t'+i).className=i==n?'pg act':'pg';document.getElementById('b'+i).className=i==n?'act':''});drw()}function addS(){var v=document.getElementById('inS').value.trim();if(v){db.s.push(v);db.cs=v;document.getElementById('inS').value='';sv()}}function addR(){var v=document.getElementById('inR').value.trim();if(v){db.r.push(v);db.cr=v;document.getElementById('inR').value='';sv()}}function addB(){var v=document.getElementById('inBK').value.trim(),p=document.getElementById('inBP').value.trim();if(v){db.b.push({n:v,p:p});document.getElementById('inBK').value='';document.getElementById('inBP').value='';sv()}}function addFB(){var i=document.getElementById('selB').value;if(i!==''){var u=db.b[i];db.k.push({id:Date.now(),n:u.n,p:u.p,rt:db.cr,ta:gT(),st:'none',s1:'',t1:'',s2:'',t2:''});sv()}}function mk(id,a){var s=db.cs||document.getElementById('st').value,t=gT();db.k.forEach(function(x){if(x.id==id){if(a=='in'){x.st='in';x.s1=s;x.t1=t;x.s2='';x.t2=''}else if(a=='out'){x.st='out';x.s2=s;x.t2=t}else{x.st='abs';x.s1='';x.t1='';x.s2='';x.t2=''}}});sv()}function clr(){db.k.forEach(function(x){if(!x.rt||x.rt==db.cr){x.st='none';x.s1='';x.t1='';x.s2='';x.t2=''}});sv()}function toArch(){var fk=db.k.filter(function(x){return !x.rt||x.rt==db.cr});db.a.unshift({dt:gD(),tm:gT(),rt:db.cr,by:db.cu,k:JSON.parse(JSON.stringify(fk))});sv();alert('Сохранено')}function cp(){var fk=db.k.filter(function(x){return !x.rt||x.rt==db.cr});var txt=gD()+' '+gT()+' '+db.cr+'('+db.cu+')\n'+fk.map(function(x,i){return(i+1)+'.'+x.n+':'+(x.st=='abs'?'Нет':x.s1+'('+x.t1+')-'+(x.s2||'путь')+'('+x.t2+')')}).join('\n');prompt('Скопируйте:',txt)}function exp(){document.getElementById('sBox').value=btoa(unescape(encodeURIComponent(JSON.stringify(db))));alert('Код создан!')}function imp(){try{Object.assign(db,JSON.parse(decodeURIComponent(escape(atob(document.getElementById('sBox').value.trim())))));sv();alert('Загружено!')}catch(e){alert('Ошибка кода')}}function drw(){document.getElementById('lS').innerHTML=db.s.map(function(x,i){return'<span class="tag">'+x+' <b onclick="db.s.splice('+i+',1);sv()">x</b></span>'}).join('');document.getElementById('lR').innerHTML=db.r.map(function(x,i){return'<span class="tag">'+x+' <b onclick="db.r.splice('+i+',1);sv()">x</b></span>'}).join('');document.getElementById('lB').innerHTML=db.b.map(function(x,i){return'<div>'+(i+1)+'.'+x.n+'('+x.p+') <b onclick="db.b.splice('+i+',1);sv()">[x]</b></div>'}).join('');document.getElementById('selB').innerHTML=db.b.map(function(x,i){return'<option value="'+i+'">'+x.n+'</option>'}).join('');var sr=document.getElementById('rt');sr.innerHTML=db.r.map(function(x){return'<option>'+x+'</option>'}).join('');if(db.r.includes(db.cr))sr.value=db.cr;else if(db.r.length)db.cr=db.r[0];var ss=document.getElementById('st');ss.innerHTML=db.s.map(function(x){return'<option>'+x+'</option>'}).join('');if(db.s.includes(db.cs))ss.value=db.cs;else if(db.s.length)db.cs=db.s[0];var fk=db.k.filter(function(x){return !x.rt||x.rt==db.cr});document.getElementById('trip').innerHTML=fk.map(function(x){return'<div class="kid '+x.st+'"><b>'+x.n+'</b> '+(x.p?'<a href="tel:'+x.p+'">[Звонок]</a>':'')+'<div>'+x.s1+'('+x.t1+')-'+x.s2+'('+x.t2+')</div><div class="kbtns"><button class="bg" onclick="mk('+x.id+',\'in\')">Зашел</button><button style="background:#007aff" onclick="mk('+x.id+',\'out\')">Вышел</button><button class="br" onclick="mk('+x.id+',\'abs\')">Нет</button></div></div>'}).join('');document.getElementById('rep').innerHTML='<div class="card"><b>'+gD()+' '+gT()+' '+db.cr+' ('+db.cu+')</b><br>'+fk.map(function(x,i){return(i+1)+'.'+x.n+':'+(x.st=='abs'?'Нет':x.s1+'('+x.t1+')-'+(x.s2||'путь')+'('+x.t2+')')}).join('<br>')+'</div>';document.getElementById('arch').innerHTML=db.a.map(function(x){return'<div class="card"><b>'+x.dt+' '+x.tm+' '+x.rt+' ('+x.by+')</b><br>'+x.k.map(function(y,i){return(i+1)+'.'+y.n+':'+y.s1+'-'+y.s2}).join('<br>')+'</div>'}).join('')}chk();</script></body></html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Журнал автобуса</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f2f2f7; margin: 0; padding: 12px 12px 90px; color: #1c1c1e; }
+.nav { display: flex; background: #e5e5ea; border-radius: 10px; padding: 4px; margin-bottom: 12px; gap: 3px; }
+.nav button { flex: 1; padding: 10px 2px; border: 0; border-radius: 8px; background: transparent; font-size: 12px; font-weight: bold; color: #666; cursor: pointer; }
+.nav button.act { background: #fff; color: #007aff; }
+.pg { display: none; }
+.pg.act { display: block; }
+.card { background: #fff; padding: 14px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; margin-bottom: 10px; background: #fff; }
+.btn { width: 100%; padding: 12px; border: 0; border-radius: 8px; font-size: 15px; font-weight: bold; color: #fff; background: #007aff; cursor: pointer; margin-bottom: 6px; }
+.bg { background: #34c759; }
+.bo { background: #ff9500; }
+.br { background: #ff3b30; }
+.bp { background: #5856d6; }
+.bd { background: #1c1c1e; }
+.tag { display: inline-block; background: #e5e5ea; padding: 6px 10px; border-radius: 6px; margin: 3px; font-size: 14px; }
+.kid { background: #fff; padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid #ccc; }
+.kid.in { border-left-color: #34c759; background: #f0fdf4; }
+.kid.out { border-left-color: #007aff; background: #f0f7ff; }
+.kid.abs { border-left-color: #ff3b30; background: #fef2f2; }
+.kbtns { display: flex; gap: 6px; margin-top: 8px; }
+.kbtns button { flex: 1; padding: 10px; border: 0; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
+.clk { background: #007aff15; color: #007aff; padding: 8px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 10px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; color: #555; }
+.msg { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 14px; display: none; z-index: 999; text-align: center; }
+@media print {
+  .nav, .no-print, .topbar, .clk, .msg { display: none !important; }
+  body { background: #fff; padding: 0; }
+  .card { box-shadow: none; border: 1px solid #ccc; }
+  .pg { display: none !important; }
+  #t3 { display: block !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="card" style="max-width: 400px; margin: 40px auto;">
+  <h2 style="margin-top:0; text-align:center;">🚌 Вход в журнал</h2>
+  <input id="uLog" type="text" placeholder="Логин (по умолчанию: admin)">
+  <input id="uPass" type="password" placeholder="Пароль (по умолчанию: 1234)">
+  <button type="button" class="btn" onclick="doLogin()">Войти</button>
+  <button type="button" class="btn bg" onclick="doReg()">Зарегистрировать нового пользователя</button>
+</div>
+
+<div id="appScreen" style="display:none;">
+  <div class="topbar">
+    <span>👤 Пользователь: <b id="curUserName"></b></span>
+    <button type="button" onclick="doLogout()" style="border:0; background:#e5e5ea; padding:5px 10px; border-radius:6px; font-weight:bold;">Выйти</button>
+  </div>
+
+  <div class="nav">
+    <button type="button" id="b1" onclick="tab(1)">Настройка</button>
+    <button type="button" id="b5" onclick="tab(5)">База</button>
+    <button type="button" id="b2" class="act" onclick="tab(2)">Поездка</button>
+    <button type="button" id="b3" onclick="tab(3)">Отчет</button>
+    <button type="button" id="b4" onclick="tab(4)">Архив</button>
+  </div>
+
+  <div id="t1" class="pg">
+    <div class="card">
+      <b>🚏 Остановки</b>
+      <input id="inS" placeholder="Название остановки" style="margin-top:8px;">
+      <button type="button" class="btn" onclick="addS()">+ Добавить остановку</button>
+      <div id="lS"></div>
+    </div>
+    <div class="card">
+      <b>🔄 Рейсы</b>
+      <input id="inR" placeholder="Название рейса" style="margin-top:8px;">
+      <button type="button" class="btn" onclick="addR()">+ Добавить рейс</button>
+      <div id="lR"></div>
+    </div>
+    <div class="card">
+      <b>👥 Пользователи (логин и пароль)</b>
+      <input id="nUL" placeholder="Новый логин" style="margin-top:8px;">
+      <input id="nUP" placeholder="Новый пароль">
+      <button type="button" class="btn bg" onclick="addUser()">+ Добавить пользователя</button>
+      <div id="lU" style="margin-top:8px;"></div>
+    </div>
+    <div class="card">
+      <b>☁️ Перенос данных на другое устройство</b>
+      <p style="font-size:13px; color:#666; margin:6px 0;">Нажмите «Создать код», скопируйте его и вставьте на другом телефоне или компьютере, чтобы перенести всю базу, пользователей и архив.</p>
+      <textarea id="syncBox" rows="3" placeholder="Здесь появится код для переноса или вставьте сюда код с другого устройства..."></textarea>
+      <button type="button" class="btn bp" onclick="exportData()">1. Создать код для переноса</button>
+      <button type="button" class="btn bg" onclick="importData()">2. Загрузить данные из кода</button>
+    </div>
+  </div>
+
+  <div id="t5" class="pg">
+    <div class="card">
+      <b>👶 База учеников</b>
+      <input id="inBK" placeholder="ФИО ученика" style="margin-top:8px;">
+      <input id="inBP" placeholder="Телефон родителей">
+      <button type="button" class="btn bg" onclick="addBase()">+ Сохранить в базу</button>
+      <div id="lB" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div id="t2" class="pg act">
+    <div class="clk" id="clk"></div>
+    <div class="card">
+      Рейс: <select id="rt" onchange="setR(this.value)"></select>
+      Текущая остановка: <select id="st" onchange="setS(this.value)"></select>
+    </div>
+    <div class="card">
+      <b>Добавить ученика на этот рейс:</b>
+      <select id="selB" style="margin-top:6px;"></select>
+      <button type="button" class="btn bg" onclick="addFromBase()">+ Добавить в поездку</button>
+    </div>
+    <div id="trip"></div>
+    <button type="button" class="btn bo" onclick="clr()">Сбросить отметки этого рейса</button>
+  </div>
+
+  <div id="t3" class="pg">
+    <div id="rep"></div>
+    <div class="no-print">
+      <button type="button" class="btn bd" onclick="window.print()">🖨️ Печать на принтер</button>
+      <button type="button" class="btn bp" onclick="toArch()">💾 Сохранить в Архив</button>
+      <button type="button" class="btn bg" onclick="cp()">📋 Скопировать текстом</button>
+    </div>
+  </div>
+
+  <div id="t4" class="pg">
+    <div id="arch"></div>
+  </div>
+</div>
+
+<div id="toast" class="msg"></div>
+
+<script>
+var db = {
+  users: new Array({ l: "admin", p: "1234" }),
+  curUser: null,
+  s: new Array("Остановка 1", "Школа"),
+  r: new Array("Утро", "Вечер"),
+  b: new Array(),
+  k: new Array(),
+  a: new Array(),
+  cr: "Утро",
+  cs: "Остановка 1"
+};
+
+try {
+  var saved = localStorage.getItem("bus_gh_v7");
+  if (saved) {
+    var p = JSON.parse(saved);
+    if (p.users) db.users = p.users;
+    if (p.curUser) db.curUser = p.curUser;
+    if (p.s) db.s = p.s;
+    if (p.r) db.r = p.r;
+    if (p.b) db.b = p.b;
+    if (p.k) db.k = p.k;
+    if (p.a) db.a = p.a;
+    if (p.cr) db.cr = p.cr;
+    if (p.cs) db.cs = p.cs;
+  }
+} catch (e) {}
+
+function getEl(arr, idx) {
+  var res = null;
+  arr.forEach(function(item, i) {
+    if (i === idx) res = item;
+  });
+  return res;
+}
+
+function notify(txt) {
+  var el = document.getElementById("toast");
+  if (!el) return;
+  el.textContent = txt;
+  el.style.display = "block";
+  setTimeout(function() { el.style.display = "none"; }, 2500);
+}
+
+function sv() {
+  try { localStorage.setItem("bus_gh_v7", JSON.stringify(db)); } catch (e) {}
+  if (db.curUser) drw();
+}
+
+function pad2(n) {
+  return n < 10 ? "0" + n : "" + n;
+}
+
+function gD() {
+  var n = new Date();
+  return pad2(n.getDate()) + "." + pad2(n.getMonth() + 1) + "." + n.getFullYear();
+}
+
+function gT() {
+  var n = new Date();
+  return pad2(n.getHours()) + ":" + pad2(n.getMinutes());
+}
+
+setInterval(function() {
+  var el = document.getElementById("clk");
+  if (el) el.textContent = "📅 " + gD() + "   🕒 " + gT();
+}, 1000);
+
+function checkAuth() {
+  if (db.curUser) {
+    document.getElementById("authScreen").style.display = "none";
+    document.getElementById("appScreen").style.display = "block";
+    document.getElementById("curUserName").textContent = db.curUser;
+    drw();
+  } else {
+    document.getElementById("authScreen").style.display = "block";
+    document.getElementById("appScreen").style.display = "none";
+  }
+}
+
+function doLogin() {
+  var l = document.getElementById("uLog").value.trim();
+  var p = document.getElementById("uPass").value.trim();
+  var found = false;
+  db.users.forEach(function(u) {
+    if (u.l === l && u.p === p) found = true;
+  });
+  if (found) {
+    db.curUser = l;
+    sv();
+    checkAuth();
+  } else {
+    notify("Неверный логин или пароль (по умолчанию: admin / 1234)");
+  }
+}
+
+function doReg() {
+  var l = document.getElementById("uLog").value.trim();
+  var p = document.getElementById("uPass").value.trim();
+  if (!l || !p) { notify("Введите новый логин и пароль в поля выше"); return; }
+  var exists = false;
+  db.users.forEach(function(u) {
+    if (u.l === l) exists = true;
+  });
+  if (exists) { notify("Такой логин уже занят"); return; }
+  db.users.push({ l: l, p: p });
+  db.curUser = l;
+  sv();
+  checkAuth();
+  notify("Пользователь создан!");
+}
+
+function addUser() {
+  var l = document.getElementById("nUL").value.trim();
+  var p = document.getElementById("nUP").value.trim();
+  if (!l || !p) { notify("Введите логин и пароль"); return; }
+  var exists = false;
