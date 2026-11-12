@@ -59,10 +59,9 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 </div>
 <div id="tst" class="msg"></div>
 <script>
-var BUCKET="zarovshan.github.io/Bus/";
-var URL="https://yandexcloud.net"+BUCKET+"/db.json";
+var URL="functions.yandexcloud.net/d4eo3msgosg6ng0vr3k6";
 var ADM="zarovshan",db={u:[{l:"zarovshan",p:"VnIp159753"}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
-try{var x=localStorage.getItem("b_v20");if(x)Object.assign(db,JSON.parse(x))}catch(e){}
+try{var x=localStorage.getItem("b_v21");if(x)Object.assign(db,JSON.parse(x))}catch(e){}
 function e(i){return document.getElementById(i)}
 function nd(t,c,tx){var d=document.createElement(t);if(c)d.className=c;if(tx!==undefined)d.textContent=tx;return d}
 function nf(t){var b=e("tst");b.textContent=t;b.style.display="block";setTimeout(function(){b.style.display="none"},2500)}
@@ -70,13 +69,13 @@ function p2(n){return n<10?"0"+n:""+n}
 function gD(){var n=new Date();return p2(n.getDate())+"."+p2(n.getMonth()+1)+"."+n.getFullYear()}
 function gT(){var n=new Date();return p2(n.getHours())+":"+p2(n.getMinutes())}
 setInterval(function(){if(e("clk"))e("clk").textContent="📅 "+gD()+"  🕒 "+gT()},1000);
-function pushCloud(){if(!BUCKET||BUCKET.indexOf("ВПИШИТЕ")!==-1){if(e("cloudSt"))e("cloudSt").textContent="⚠️ Не вписано имя бакета в коде";return}if(e("cloudSt"))e("cloudSt").textContent="☁️ Сохранение в Яндекс...";var copy=JSON.parse(JSON.stringify(db));copy.cu=null;fetch(URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(copy)}).then(function(r){if(e("cloudSt"))e("cloudSt").textContent=r.ok?"☁️ Сохранено в Яндекс ("+gT()+")":"⚠️ Ошибка записи: код "+r.status}).catch(function(){if(e("cloudSt"))e("cloudSt").textContent="⚠️ Блокировка CORS или нет сети"})}
-function pullCloud(cb){if(!BUCKET||BUCKET.indexOf("ВПИШИТЕ")!==-1){if(e("cloudSt"))e("cloudSt").textContent="⚠️ Не вписано имя бакета в коде";if(cb)cb();return}fetch(URL+"?nocache="+Date.now()+"_"+Math.random(),{cache:"no-store"}).then(function(r){if(r.status===404){if(e("cloudSt"))e("cloudSt").textContent="☁️ Создание новой базы...";pushCloud();return null}if(!r.ok){if(e("cloudSt"))e("cloudSt").textContent="⚠️ Ошибка чтения: код "+r.status;return null}return r.json()}).then(function(data){if(data&&data.u){var me=db.cu;Object.assign(db,data);db.cu=me;try{localStorage.setItem("b_v20",JSON.stringify(db))}catch(err){}if(e("cloudSt"))e("cloudSt").textContent="☁️ Синхронизировано ("+gT()+")"}if(cb)cb()}).catch(function(){if(e("cloudSt"))e("cloudSt").textContent="⚠️ Нет связи (проверьте CORS и имя бакета)";if(cb)cb()})}
-function sv(){try{localStorage.setItem("b_v20",JSON.stringify(db))}catch(err){}if(db.cu)drw();pushCloud()}
+function pushCloud(){if(!URL||URL.indexOf("ВПИШИТЕ")!==-1)return;if(e("cloudSt"))e("cloudSt").textContent="☁️ Сохранение в Яндекс...";var copy=JSON.parse(JSON.stringify(db));copy.cu=null;fetch(URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(copy)}).then(function(r){if(e("cloudSt"))e("cloudSt").textContent=r.ok?"☁️ Сохранено в Яндекс ("+gT()+")":"⚠️ Ошибка записи: "+r.status}).catch(function(){if(e("cloudSt"))e("cloudSt").textContent="⚠️ Нет связи с функцией"})}
+function pullCloud(cb){if(!URL||URL.indexOf("ВПИШИТЕ")!==-1){if(cb)cb();return}fetch(URL+"?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(data){if(data&&data.u){var me=db.cu;Object.assign(db,data);db.cu=me;try{localStorage.setItem("b_v21",JSON.stringify(db))}catch(err){}if(e("cloudSt"))e("cloudSt").textContent="☁️ Синхронизировано ("+gT()+")"}else{if(e("cloudSt"))e("cloudSt").textContent="☁️ База готова к работе"}if(cb)cb()}).catch(function(){if(e("cloudSt"))e("cloudSt").textContent="⚠️ Нет связи с Яндекс";if(cb)cb()})}
+function sv(){try{localStorage.setItem("b_v21",JSON.stringify(db))}catch(err){}if(db.cu)drw();pushCloud()}
 function chk(){e("auth").style.display=db.cu?"none":"block";e("app").style.display=db.cu?"block":"none";if(db.cu){e("cU").textContent=db.cu+(db.cu===ADM?" (Админ)":"");e("admBox").style.display=db.cu===ADM?"block":"none";drw()}}
-e("bLn").onclick=function(){var l=e("uL").value.trim(),p=e("uP").value.trim();e("bLn").textContent="Загрузка базы...";pullCloud(function(){e("bLn").textContent="Войти";var ok=0;db.u.forEach(function(u){if(u.l===l&&u.p===p)ok=1});if(ok){db.cu=l;try{localStorage.setItem("b_v20",JSON.stringify(db))}catch(err){}chk()}else nf("Неверный логин или пароль")})};
-e("bOut").onclick=function(){db.cu=null;try{localStorage.setItem("b_v20",JSON.stringify(db))}catch(err){}chk()};
-e("bSync").onclick=function(){if(e("cloudSt"))e("cloudSt").textContent="🔄 Проверка облака...";pullCloud(function(){drw()})};
+e("bLn").onclick=function(){var l=e("uL").value.trim(),p=e("uP").value.trim();e("bLn").textContent="Загрузка базы...";pullCloud(function(){e("bLn").textContent="Войти";var ok=0;db.u.forEach(function(u){if(u.l===l&&u.p===p)ok=1});if(ok){db.cu=l;try{localStorage.setItem("b_v21",JSON.stringify(db))}catch(err){}chk()}else nf("Неверный логин или пароль")})};
+e("bOut").onclick=function(){db.cu=null;try{localStorage.setItem("b_v21",JSON.stringify(db))}catch(err){}chk()};
+e("bSync").onclick=function(){if(e("cloudSt"))e("cloudSt").textContent="🔄 Обновление...";pullCloud(function(){drw();nf("Обновлено")})};
 function tab(n){for(var i=1;i<=5;i++){e("t"+i).className=i===n?"pg act":"pg";e("b"+i).className=i===n?"act":""}drw()}
 e("b1").onclick=function(){tab(1)};e("b2").onclick=function(){tab(2)};e("b3").onclick=function(){tab(3)};e("b4").onclick=function(){tab(4)};e("b5").onclick=function(){tab(5)};
 e("rt").onchange=function(){db.cr=this.value;sv()};e("st").onchange=function(){db.cs=this.value;sv()};
@@ -103,7 +102,7 @@ fk.forEach(function(x){var c=nd("div","kid "+x.st),t=nd("div","row");t.style.bor
 var rp=e("rep");rp.innerHTML="";var rc=nd("div","card");rc.appendChild(nd("b","","Отчет "+gD()+" "+gT()+" | "+db.cr+" ("+db.cu+")"));fk.forEach(function(x,i){rc.appendChild(nd("div","",(i+1)+". "+x.n+": "+(x.st==="abs"?"Нет":x.s1+"("+x.t1+")-"+(x.s2||"путь")+"("+x.t2+")")))});rp.appendChild(rc);
 var ar=e("arch");ar.innerHTML="";db.a.forEach(function(x,i){var ac=nd("div","card"),at=nd("div","row");at.style.border=0;at.appendChild(nd("b","",x.dt+" "+x.tm+" "+x.rt+" ("+x.by+")"));var dx=nd("span","dx","✕");dx.onclick=function(){db.a.splice(i,1);sv()};at.appendChild(dx);ac.appendChild(at);x.k.forEach(function(y,j){ac.appendChild(nd("div","",(j+1)+". "+y.n+": "+(y.st==="abs"?"Нет":y.s1+"-"+y.s2)))});ar.appendChild(ac)});
 }
-pullCloud(function(){if(e("vs")){e("vs").textContent="Версия 20 (готова)";e("vs").style.color="#34c759"}chk()});
+pullCloud(function(){if(e("vs")){e("vs").textContent="Версия 21 (готова)";e("vs").style.color="#34c759"}chk()});
 </script>
 </body>
 </html>
