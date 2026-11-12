@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Журнал автобуса</title>
+<style>
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f2f2f7; margin: 0; padding: 12px 12px 80px; color: #1c1c1e; }
+.nav { display: flex; background: #e5e5ea; border-radius: 10px; padding: 4px; margin-bottom: 12px; gap: 3px; }
+.nav button { flex: 1; padding: 10px 2px; border: 0; border-radius: 8px; background: transparent; font-size: 12px; font-weight: bold; color: #666; cursor: pointer; }
+.nav button.act { background: #fff; color: #007aff; }
+.pg { display: none; }
+.pg.act { display: block; }
+.card { background: #fff; padding: 14px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; margin-bottom: 10px; background: #fff; }
+.btn { width: 100%; padding: 12px; border: 0; border-radius: 8px; font-size: 15px; font-weight: bold; color: #fff; background: #007aff; cursor: pointer; margin-bottom: 6px; }
+.bg { background: #34c759; }
+.bo { background: #ff9500; }
+.br { background: #ff3b30; }
+.bp { background: #5856d6; }
+.bd { background: #1c1c1e; }
+.tag { display: inline-block; background: #e5e5ea; padding: 6px 10px; border-radius: 6px; margin: 3px; font-size: 14px; }
+.kid { background: #fff; padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid #ccc; }
+.kid.in { border-left-color: #34c759; background: #f0fdf4; }
+.kid.out { border-left-color: #007aff; background: #f0f7ff; }
+.kid.abs { border-left-color: #ff3b30; background: #fef2f2; }
+.kbtns { display: flex; gap: 6px; margin-top: 8px; }
+.kbtns button { flex: 1; padding: 10px; border: 0; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
+.clk { background: #007aff15; color: #007aff; padding: 8px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 10px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; color: #555; }
+@media print {
+  .nav, .no-print, .topbar, .clk { display: none !important; }
+  body { background: #fff; padding: 0; }
+  .card { box-shadow: none; border: 1px solid #ccc; }
+  .pg { display: none !important; }
+  #t3 { display: block !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="card" style="max-width: 400px; margin: 40px auto;">
+  <h2 style="margin-top:0; text-align:center;">🚌 Вход в журнал</h2>
+  <input id="uLog" type="text" placeholder="Логин (по умолчанию: admin)">
+  <input id="uPass" type="password" placeholder="Пароль (по умолчанию: 1234)">
+  <button type="button" class="btn" onclick="doLogin()">Войти</button>
+  <button type="button" class="btn bg" onclick="doReg()">Зарегистрировать нового пользователя</button>
+</div>
+
+<div id="appScreen" style="display:none;">
+  <div class="topbar">
+    <span>👤 Пользователь: <b id="curUserName"></b></span>
+    <button type="button" onclick="doLogout()" style="border:0; background:#e5e5ea; padding:5px 10px; border-radius:6px; font-weight:bold;">Выйти</button>
+  </div>
+
+  <div class="nav">
+    <button type="button" id="b1" onclick="tab(1)">Настройка</button>
+    <button type="button" id="b5" onclick="tab(5)">База</button>
+    <button type="button" id="b2" class="act" onclick="tab(2)">Поездка</button>
+    <button type="button" id="b3" onclick="tab(3)">Отчет</button>
+    <button type="button" id="b4" onclick="tab(4)">Архив</button>
+  </div>
+
+  <div id="t1" class="pg">
+    <div class="card">
+      <b>🚏 Остановки</b>
+      <input id="inS" placeholder="Название остановки" style="margin-top:8px;">
+      <button type="button" class="btn" onclick="addS()">+ Добавить остановку</button>
+      <div id="lS"></div>
+    </div>
+    <div class="card">
+      <b>🔄 Рейсы</b>
+      <input id="inR" placeholder="Название рейса" style="margin-top:8px;">
+      <button type="button" class="btn" onclick="addR()">+ Добавить рейс</button>
+      <div id="lR"></div>
+    </div>
+    <div class="card">
+      <b>☁️ Перенос данных на другое устройство</b>
+      <p style="font-size:13px; color:#666; margin:6px 0;">Нажмите «Создать код», скопируйте его и вставьте на другом телефоне или компьютере, чтобы перенести всю базу, пользователей и архив.</p>
+      <textarea id="syncBox" rows="3" placeholder="Здесь появится код для переноса или вставьте сюда код с другого устройства..."></textarea>
+      <button type="button" class="btn bp" onclick="exportData()">1. Создать код для переноса</button>
+      <button type="button" class="btn bg" onclick="importData()">2. Загрузить данные из кода</button>
+    </div>
+  </div>
+
+  <div id="t5" class="pg">
+    <div class="card">
+      <b>👶 База учеников</b>
+      <input id="inBK" placeholder="ФИО ученика" style="margin-top:8px;">
+      <input id="inBP" placeholder="Телефон родителей">
+      <button type="button" class="btn bg" onclick="addBase()">+ Сохранить в базу</button>
+      <div id="lBase" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div id="t2" class="pg act">
+    <div class="clk" id="clk"></div>
+    <div class="card">
+      Рейс: <select id="rt" onchange="setR(this.value)"></select>
+      Текущая остановка: <select id="st" onchange="setS(this.value)"></select>
+    </div>
+    <div class="card">
+      <b>Добавить ученика на этот рейс:</b>
+      <select id="selBase" style="margin-top:6px;"></select>
+      <button type="button" class="btn bg" onclick="addFromBase()">+ Добавить в поездку</button>
+    </div>
+    <div id="trip"></div>
+    <button type="button" class="btn bo" onclick="clr()">Сбросить отметки этого рейса</button>
+  </div>
+
+  <div id="t3" class="pg">
+    <div id="rep"></div>
+    <div class="no-print">
+      <button type="button" class="btn bd" onclick="window.print()">🖨️ Печать на принтер</button>
+      <button type="button" class="btn bp" onclick="toArch()">💾 Сохранить в Архив</button>
+      <button type="button" class="btn bg" onclick="cp()">📋 Скопировать текстом</button>
+    </div>
+  </div>
+
+  <div id="t4" class="pg">
+    <div id="arch"></div>
+  </div>
+</div>
+
+<script>
+var db = {
+  users: { "admin": "1234" },
+  curUser: null,
+  s: new Array("Остановка 1", "Школа"),
+  r: new Array("Утро", "Вечер"),
+  b: new Array(),
+  k: new Array(),
+  a: new Array(),
+  cr: "Утро",
+  cs: "Остановка 1"
+};
+
+try {
+  var saved = localStorage.getItem("bus_pro_v3");
+  if (saved) {
+    var p = JSON.parse(saved);
+    if (p.users) db.users = p.users;
+    if (p.curUser) db.curUser = p.curUser;
+    if (p.s) db.s = p.s;
+    if (p.r) db.r = p.r;
+    if (p.b) db.b = p.b;
+    if (p.k) db.k = p.k;
+    if (p.a) db.a = p.a;
+    if (p.cr) db.cr = p.cr;
+    if (p.cs) db.cs = p.cs;
+  }
+} catch (e) {}
+
+function sv() {
+  try { localStorage.setItem("bus_pro_v3", JSON.stringify(db)); } catch (e) {}
+  if (db.curUser) drw();
+}
+
+function gD() {
+  var n = new Date();
+  return String(n.getDate()).padStart(2, "0") + "." + String(n.getMonth() + 1).padStart(2, "0") + "." + n.getFullYear();
+}
+function gT() {
+  var n = new Date();
+  return String(n.getHours()).padStart(2, "0") + ":" + String(n.getMinutes()).padStart(2, "0");
+}
+setInterval(function() {
+  var el = document.getElementById("clk");
+  if (el) el.textContent = "📅 " + gD() + "   🕒 " + gT();
+}, 1000);
+
+function checkAuth() {
+  if (db.curUser) {
+    document.getElementById("authScreen").style.display = "none";
+    document.getElementById("appScreen").style.display = "block";
+    document.getElementById("curUserName").textContent = db.curUser;
+    drw();
+  } else {
+    document.getElementById("authScreen").style.display = "block";
+    document.getElementById("appScreen").style.display = "none";
+  }
+}
+
+function doLogin() {
+  var l = document.getElementById("uLog").value.trim();
+  var p = document.getElementById("uPass").value.trim();
+  if (db.users && db.users.hasOwnProperty(l) && db.users.valueOf() && Object.getOwnPropertyDescriptor(db.users, l).value === p) {
+    db.curUser = l;
+    sv();
+    checkAuth();
+  } else {
+    alert("Неверный логин или пароль. По умолчанию: admin и 1234");
+  }
+}
+
+function doReg() {
+  var l = document.getElementById("uLog").value.trim();
+  var p = document.getElementById("uPass").value.trim();
+  if (!l || !p) { alert("Введите новый логин и пароль в поля выше"); return; }
+  if (db.users.hasOwnProperty(l)) { alert("Такой логин уже занят"); return; }
+  Object.defineProperty(db.users, l, { value: p, writable: true, enumerable: true, configurable: true });
+  db.curUser = l;
+  sv();
+  checkAuth();
+  alert("Пользователь создан!");
+}
+
+function doLogout() {
+  db.curUser = null;
+  sv();
+  checkAuth();
+}
+
+function tab(n) {
+  var tabs = new Array(1, 2, 3, 4, 5);
+  for (var idx = 0; idx < tabs.length; idx++) {
+    var i = tabs.at(idx);
+    document.getElementById("t" + i).className = (i === n) ? "pg act" : "pg";
+    document.getElementById("b" + i).className = (i === n) ? "act" : "";
+  }
+  drw();
+}
+
+function setR(v) { db.cr = v; sv(); }
+function setS(v) { db.cs = v; sv(); }
+
+function addS() {
+  var v = document.getElementById("inS").value.trim();
+  if (v) { db.s.push(v); db.cs = v; document.getElementById("inS").value = ""; sv(); }
+}
+function addR() {
+  var v = document.getElementById("inR").value.trim();
+  if (v) { db.r.push(v); db.cr = v; document.getElementById("inR").value = ""; sv(); }
+}
+function addBase() {
+  var v = document.getElementById("inBK").value.trim();
+  var p = document.getElementById("inBP").value.trim();
+  if (v) { db.b.push({ id: Date.now(), n: v, p: p }); document.getElementById("inBK").value = ""; document.getElementById("inBP").value = ""; sv(); }
+}
+function addFromBase() {
+  var idx = document.getElementById("selBase").value;
+  if (idx === "") return;
+  var u = db.b.at(Number(idx));
+  if (u) {
