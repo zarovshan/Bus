@@ -44,7 +44,7 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 
 <div id="authScreen" class="card" style="max-width: 400px; margin: 40px auto;">
   <h2 style="margin-top:0; text-align:center;">🚌 Вход в журнал</h2>
-  <div id="verStatus" style="text-align:center; font-size:13px; font-weight:bold; color:#ff9500; margin-bottom:10px;">Версия 10 (ожидание...)</div>
+  <div id="verStatus" style="text-align:center; font-size:13px; font-weight:bold; color:#ff9500; margin-bottom:10px;">Версия 11 (ожидание...)</div>
   <input id="uLog" type="text" placeholder="Логин (по умолчанию: admin)">
   <input id="uPass" type="password" placeholder="Пароль (по умолчанию: 1234)">
   <button type="button" id="btnLogin" class="btn">Войти</button>
@@ -136,6 +136,14 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 <div id="toast" class="msg"></div>
 
 <script>
+window.onerror = function(msg, url, line) {
+  var st = document.getElementById("verStatus");
+  if (st) {
+    st.textContent = "Ошибка: " + msg + " (стр. " + line + ")";
+    st.style.color = "red";
+  }
+};
+
 var db = {
   users: new Array({ l: "admin", p: "1234" }),
   curUser: null,
@@ -149,7 +157,7 @@ var db = {
 };
 
 try {
-  var saved = localStorage.getItem("bus_gh_v10");
+  var saved = localStorage.getItem("bus_gh_v11");
   if (saved) {
     var p = JSON.parse(saved);
     if (p.users) db.users = p.users;
@@ -190,7 +198,7 @@ setInterval(function() {
 }, 1000);
 
 function sv() {
-  try { localStorage.setItem("bus_gh_v10", JSON.stringify(db)); } catch (e) {}
+  try { localStorage.setItem("bus_gh_v11", JSON.stringify(db)); } catch (e) {}
   if (db.curUser) drw();
 }
 
@@ -238,12 +246,3 @@ document.getElementById("btnReg").onclick = function() {
   notify("Пользователь создан!");
 };
 
-document.getElementById("btnLogout").onclick = function() {
-  db.curUser = null;
-  sv();
-  checkAuth();
-};
-
-function tab(n) {
-  for (var i = 1; i <= 5; i++) {
-    document.getElementById("t" + i).className = (i === n) ? "pg act" : "pg";
