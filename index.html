@@ -44,7 +44,7 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 
 <div id="authScreen" class="card" style="max-width: 400px; margin: 40px auto;">
   <h2 style="margin-top:0; text-align:center;">🚌 Вход в журнал</h2>
-  <div id="verStatus" style="text-align:center; font-size:12px; color:#888; margin-bottom:10px;">Версия 8 (загрузка...)</div>
+  <div id="verStatus" style="text-align:center; font-size:13px; font-weight:bold; color:#ff9500; margin-bottom:10px;">Версия 9 (ожидание...)</div>
   <input id="uLog" type="text" placeholder="Логин (по умолчанию: admin)">
   <input id="uPass" type="password" placeholder="Пароль (по умолчанию: 1234)">
   <button type="button" id="btnLogin" class="btn">Войти</button>
@@ -136,28 +136,20 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 <div id="toast" class="msg"></div>
 
 <script>
-window.onerror = function(msg, url, line) {
-  var st = document.getElementById("verStatus");
-  if (st) {
-    st.textContent = "Ошибка: " + msg + " (стр. " + line + ")";
-    st.style.color = "red";
-  }
-};
-
 var db = {
-  users: new Array({ l: "admin", p: "1234" }),
+  users: [{ l: "admin", p: "1234" }],
   curUser: null,
-  s: new Array("Остановка 1", "Школа"),
-  r: new Array("Утро", "Вечер"),
-  b: new Array(),
-  k: new Array(),
-  a: new Array(),
+  s: ["Остановка 1", "Школа"],
+  r: ["Утро", "Вечер"],
+  b: [],
+  k: [],
+  a: [],
   cr: "Утро",
   cs: "Остановка 1"
 };
 
 try {
-  var saved = localStorage.getItem("bus_gh_v8");
+  var saved = localStorage.getItem("bus_gh_v9");
   if (saved) {
     var p = JSON.parse(saved);
     if (p.users) db.users = p.users;
@@ -172,14 +164,6 @@ try {
   }
 } catch (e) {}
 
-function getEl(arr, idx) {
-  var res = null;
-  arr.forEach(function(item, i) {
-    if (i === idx) res = item;
-  });
-  return res;
-}
-
 function notify(txt) {
   var el = document.getElementById("toast");
   if (!el) return;
@@ -189,70 +173,76 @@ function notify(txt) {
 }
 
 function sv() {
-  try { localStorage.setItem("bus_gh_v8", JSON.stringify(db)); } catch (e) {}
-  if (db.curUser) drw();
+  try { localStorage.setItem("bus_gh_v9", JSON.stringify(db)); } catch (e) {}
+  if (db.curUser && typeof drw === "function") drw();
 }
-
-function pad2(n) {
-  return n < 10 ? "0" + n : "" + n;
-}
-
-function gD() {
-  var n = new Date();
-  return pad2(n.getDate()) + "." + pad2(n.getMonth() + 1) + "." + n.getFullYear();
-}
-
-function gT() {
-  var n = new Date();
-  return pad2(n.getHours()) + ":" + pad2(n.getMinutes());
-}
-
-setInterval(function() {
-  var el = document.getElementById("clk");
-  if (el) el.textContent = "📅 " + gD() + "   🕒 " + gT();
-}, 1000);
 
 function checkAuth() {
   if (db.curUser) {
     document.getElementById("authScreen").style.display = "none";
     document.getElementById("appScreen").style.display = "block";
     document.getElementById("curUserName").textContent = db.curUser;
-    drw();
+    if (typeof drw === "function") drw();
   } else {
     document.getElementById("authScreen").style.display = "block";
     document.getElementById("appScreen").style.display = "none";
   }
 }
 
-document.getElementById("btnLogin").addEventListener("click", function() {
+document.getElementById("btnLogin").onclick = function() {
   var l = document.getElementById("uLog").value.trim();
   var p = document.getElementById("uPass").value.trim();
-  var found = false;
-  db.users.forEach(function(u) {
-    if (u.l === l && u.p === p) found = true;
-  });
-  if (found) {
+  var ok = false;
+  for (var i = 0; i < db.users.length; i++) {
+    if (db.users[i].l === l && db.users[i].p === p) ok = true;
+  }
+  if (ok) {
     db.curUser = l;
     sv();
     checkAuth();
   } else {
     notify("Неверный логин или пароль (по умолчанию: admin / 1234)");
   }
-});
+};
 
-document.getElementById("btnReg").addEventListener("click", function() {
+document.getElementById("btnReg").onclick = function() {
   var l = document.getElementById("uLog").value.trim();
   var p = document.getElementById("uPass").value.trim();
   if (!l || !p) { notify("Введите новый логин и пароль в поля выше"); return; }
-  var exists = false;
-  db.users.forEach(function(u) {
-    if (u.l === l) exists = true;
-  });
-  if (exists) { notify("Такой логин уже занят"); return; }
+  for (var i = 0; i < db.users.length; i++) {
+    if (db.users[i].l === l) { notify("Такой логин уже занят"); return; }
+  }
   db.users.push({ l: l, p: p });
   db.curUser = l;
   sv();
   checkAuth();
   notify("Пользователь создан!");
-});
+};
 
+document.getElementById("btnLogout").onclick = function() {
+  db.curUser = null;
+  sv();
+  checkAuth();
+};
+
+var stEl = document.getElementById("verStatus");
+if (stEl) {
+  stEl.textContent = "Версия 9 (готова к работе)";
+  stEl.style.color = "#34c759";
+}
+checkAuth();
+</script>
+
+<script>
+function pad2(n) { return n < 10 ? "0" + n : "" + n; }
+function gD() { var n = new Date(); return pad2(n.getDate()) + "." + pad2(n.getMonth() + 1) + "." + n.getFullYear(); }
+function gT() { var n = new Date(); return pad2(n.getHours()) + ":" + pad2(n.getMinutes()); }
+
+setInterval(function() {
+  var el = document.getElementById("clk");
+  if (el) el.textContent = "📅 " + gD() + "   🕒 " + gT();
+}, 1000);
+
+function tab(n) {
+  var list =;
+  for (var idx = 0; idx < list.length; idx++) {
