@@ -1,12 +1,14 @@
+html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Журнал автобуса</title>
 <style>
-* { box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f2f2f7; margin: 0; padding: 12px 12px 80px; color: #1c1c1e; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f2f2f7; margin: 0; padding: 12px 12px 90px; color: #1c1c1e; }
 .nav { display: flex; background: #e5e5ea; border-radius: 10px; padding: 4px; margin-bottom: 12px; gap: 3px; }
 .nav button { flex: 1; padding: 10px 2px; border: 0; border-radius: 8px; background: transparent; font-size: 12px; font-weight: bold; color: #666; cursor: pointer; }
 .nav button.act { background: #fff; color: #007aff; }
@@ -29,8 +31,9 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
 .kbtns button { flex: 1; padding: 10px; border: 0; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
 .clk { background: #007aff15; color: #007aff; padding: 8px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 10px; }
 .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; color: #555; }
+.msg { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 14px; display: none; z-index: 999; text-align: center; }
 @media print {
-  .nav, .no-print, .topbar, .clk { display: none !important; }
+  .nav, .no-print, .topbar, .clk, .msg { display: none !important; }
   body { background: #fff; padding: 0; }
   .card { box-shadow: none; border: 1px solid #ccc; }
   .pg { display: none !important; }
@@ -76,6 +79,13 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
       <div id="lR"></div>
     </div>
     <div class="card">
+      <b>👥 Пользователи (логин и пароль)</b>
+      <input id="nUL" placeholder="Новый логин" style="margin-top:8px;">
+      <input id="nUP" placeholder="Новый пароль">
+      <button type="button" class="btn bg" onclick="addUser()">+ Добавить пользователя</button>
+      <div id="lU" style="margin-top:8px;"></div>
+    </div>
+    <div class="card">
       <b>☁️ Перенос данных на другое устройство</b>
       <p style="font-size:13px; color:#666; margin:6px 0;">Нажмите «Создать код», скопируйте его и вставьте на другом телефоне или компьютере, чтобы перенести всю базу, пользователей и архив.</p>
       <textarea id="syncBox" rows="3" placeholder="Здесь появится код для переноса или вставьте сюда код с другого устройства..."></textarea>
@@ -90,7 +100,7 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
       <input id="inBK" placeholder="ФИО ученика" style="margin-top:8px;">
       <input id="inBP" placeholder="Телефон родителей">
       <button type="button" class="btn bg" onclick="addBase()">+ Сохранить в базу</button>
-      <div id="lBase" style="margin-top:10px;"></div>
+      <div id="lB" style="margin-top:10px;"></div>
     </div>
   </div>
 
@@ -102,7 +112,7 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
     </div>
     <div class="card">
       <b>Добавить ученика на этот рейс:</b>
-      <select id="selBase" style="margin-top:6px;"></select>
+      <select id="selB" style="margin-top:6px;"></select>
       <button type="button" class="btn bg" onclick="addFromBase()">+ Добавить в поездку</button>
     </div>
     <div id="trip"></div>
@@ -123,9 +133,11 @@ input, select, textarea { width: 100%; padding: 11px; border: 1px solid #ccc; bo
   </div>
 </div>
 
+<div id="toast" class="msg"></div>
+
 <script>
 var db = {
-  users: { "admin": "1234" },
+  users: new Array({ l: "admin", p: "1234" }),
   curUser: null,
   s: new Array("Остановка 1", "Школа"),
   r: new Array("Утро", "Вечер"),
@@ -137,7 +149,7 @@ var db = {
 };
 
 try {
-  var saved = localStorage.getItem("bus_pro_v3");
+  var saved = localStorage.getItem("bus_gh_v6");
   if (saved) {
     var p = JSON.parse(saved);
     if (p.users) db.users = p.users;
@@ -152,8 +164,15 @@ try {
   }
 } catch (e) {}
 
+function notify(txt) {
+  var el = document.getElementById("toast");
+  el.textContent = txt;
+  el.style.display = "block";
+  setTimeout(function() { el.style.display = "none"; }, 2500);
+}
+
 function sv() {
-  try { localStorage.setItem("bus_pro_v3", JSON.stringify(db)); } catch (e) {}
+  try { localStorage.setItem("bus_gh_v6", JSON.stringify(db)); } catch (e) {}
   if (db.curUser) drw();
 }
 
@@ -185,61 +204,44 @@ function checkAuth() {
 function doLogin() {
   var l = document.getElementById("uLog").value.trim();
   var p = document.getElementById("uPass").value.trim();
-  if (db.users && db.users.hasOwnProperty(l) && db.users.valueOf() && Object.getOwnPropertyDescriptor(db.users, l).value === p) {
+  var found = false;
+  for (var i = 0; i < db.users.length; i++) {
+    var u = db.users.at(i);
+    if (u.l === l && u.p === p) {
+      found = true;
+      break;
+    }
+  }
+  if (found) {
     db.curUser = l;
     sv();
     checkAuth();
   } else {
-    alert("Неверный логин или пароль. По умолчанию: admin и 1234");
+    notify("Неверный логин или пароль (по умолчанию: admin / 1234)");
   }
 }
 
 function doReg() {
   var l = document.getElementById("uLog").value.trim();
   var p = document.getElementById("uPass").value.trim();
-  if (!l || !p) { alert("Введите новый логин и пароль в поля выше"); return; }
-  if (db.users.hasOwnProperty(l)) { alert("Такой логин уже занят"); return; }
-  Object.defineProperty(db.users, l, { value: p, writable: true, enumerable: true, configurable: true });
+  if (!l || !p) { notify("Введите новый логин и пароль в поля выше"); return; }
+  for (var i = 0; i < db.users.length; i++) {
+    if (db.users.at(i).l === l) {
+      notify("Такой логин уже занят");
+      return;
+    }
+  }
+  db.users.push({ l: l, p: p });
   db.curUser = l;
   sv();
   checkAuth();
-  alert("Пользователь создан!");
+  notify("Пользователь создан!");
 }
 
-function doLogout() {
-  db.curUser = null;
-  sv();
-  checkAuth();
-}
-
-function tab(n) {
-  var tabs = new Array(1, 2, 3, 4, 5);
-  for (var idx = 0; idx < tabs.length; idx++) {
-    var i = tabs.at(idx);
-    document.getElementById("t" + i).className = (i === n) ? "pg act" : "pg";
-    document.getElementById("b" + i).className = (i === n) ? "act" : "";
-  }
-  drw();
-}
-
-function setR(v) { db.cr = v; sv(); }
-function setS(v) { db.cs = v; sv(); }
-
-function addS() {
-  var v = document.getElementById("inS").value.trim();
-  if (v) { db.s.push(v); db.cs = v; document.getElementById("inS").value = ""; sv(); }
-}
-function addR() {
-  var v = document.getElementById("inR").value.trim();
-  if (v) { db.r.push(v); db.cr = v; document.getElementById("inR").value = ""; sv(); }
-}
-function addBase() {
-  var v = document.getElementById("inBK").value.trim();
-  var p = document.getElementById("inBP").value.trim();
-  if (v) { db.b.push({ id: Date.now(), n: v, p: p }); document.getElementById("inBK").value = ""; document.getElementById("inBP").value = ""; sv(); }
-}
-function addFromBase() {
-  var idx = document.getElementById("selBase").value;
-  if (idx === "") return;
-  var u = db.b.at(Number(idx));
-  if (u) {
+function addUser() {
+  var l = document.getElementById("nUL").value.trim();
+  var p = document.getElementById("nUP").value.trim();
+  if (!l || !p) { notify("Введите логин и пароль"); return; }
+  for (var i = 0; i < db.users.length; i++) {
+    if (db.users.at(i).l === l) {
+      notify("Такой логин уже есть");
