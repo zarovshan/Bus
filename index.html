@@ -15,7 +15,7 @@ body{font-family:-apple-system,sans-serif;background:#f2f2f7;margin:0;padding:12
 .card{background:#fff;padding:14px;border-radius:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
 input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radius:8px;font-size:16px;margin-bottom:10px;background:#fff}
 .btn{width:100%;padding:12px;border:0;border-radius:8px;font-size:15px;font-weight:bold;color:#fff;background:#007aff;margin-bottom:6px;cursor:pointer}
-.bg{background:#34c759}.bo{background:#ff9500}.br{background:#ff3b30}.bp{background:#5856d6}.bd{background:#1c1c1e}
+.bg{background:#34c759}.bo{background:#ff9500}.br{background:#ff3b30}.bp{background:#5856d6}.bd{background:#1c1c1e}.btg{background:#24A1DE}.bwa{background:#25D366}.btb{background:#ffdd2d;color:#1c1c1e}
 .tag{display:inline-flex;align-items:center;gap:6px;background:#e5e5ea;padding:6px 10px;border-radius:6px;margin:3px;font-size:14px}
 .kid{background:#fff;padding:12px;border-radius:12px;margin-bottom:10px;border-left:5px solid #ccc}
 .kid.in{border-left-color:#34c759;background:#f0fdf4}.kid.out{border-left-color:#007aff;background:#f0f7ff}.kid.abs{border-left-color:#ff3b30;background:#fef2f2}
@@ -33,18 +33,26 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 .lnk{text-align:center;font-size:12px;color:#007aff;margin-top:6px;cursor:pointer}
 .bpick{max-height:220px;overflow-y:auto;border:1px solid #eee;border-radius:8px;padding:0 8px}
 .sbtn{border:0;background:#34c759;color:#fff;padding:6px 10px;border-radius:6px;font-weight:bold;font-size:13px;cursor:pointer}
-@media print{.nav,.np,.top,.clk,.msg,.sync,.cam,.sbtn{display:none!important}body{background:#fff;padding:0}.card{box-shadow:none;border:1px solid #ccc}.pg{display:none!important}#t3{display:block!important}}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.copy{font-size:12px;color:#555;text-align:center;line-height:1.5}
+.copy a{color:#007aff;text-decoration:none;font-weight:bold}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:1000}
+.mbox{background:#fff;border-radius:14px;padding:18px;max-width:360px;width:100%;text-align:center}
+@media print{.nav,.np,.top,.clk,.msg,.sync,.cam,.sbtn,.modal{display:none!important}body{background:#fff;padding:0}.card{box-shadow:none;border:1px solid #ccc}.pg{display:none!important}#t3{display:block!important}}
 </style>
 </head>
 <body>
-<div id="auth" class="card" style="max-width:400px;margin:40px auto">
+<div id="auth" class="card" style="max-width:400px;margin:30px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 32 (Единая база + Аватарки)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 33 (Единая база + Отправка)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <div id="tokBox"><input id="uT" type="password" placeholder="Токен GitHub (ghp_...)"></div>
 <button type="button" id="bLn" class="btn">Войти</button>
 <div id="rstTok" class="lnk" style="display:none">🔑 Изменить сохраненный токен</div>
+<hr style="border:0;border-top:1px solid #eee;margin:14px 0">
+<div class="copy">© Ахмадиев Виктор Игоревич<br>Тел: <a href="tel:+79297890836">+79297890836</a> | <a href="mailto:zarovshan@inbox.ru">zarovshan@inbox.ru</a></div>
+<button type="button" class="btn btb" onclick="openDon()" style="margin-top:10px;margin-bottom:0">💛 Поддержать программу (Т-Банк)</button>
 </div>
 <div id="app" style="display:none">
 <div class="top"><span id="cUBox" class="uinfo"></span><div><button type="button" id="bSync" style="border:0;background:#34c759;color:#fff;padding:5px 8px;border-radius:6px;font-weight:bold;margin-right:4px">🔄 Обновить</button><button type="button" id="bOut" style="border:0;background:#e5e5ea;padding:5px 10px;border-radius:6px;font-weight:bold">Выйти</button></div></div>
@@ -55,6 +63,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <div class="card"><b>🚏 Остановки</b><input id="iS" placeholder="Название" style="margin-top:8px"><button type="button" id="aS" class="btn">+ Добавить</button><div id="lS"></div></div>
 <div class="card"><b>🔄 Рейсы</b><input id="iR" placeholder="Название" style="margin-top:8px"><button type="button" id="aR" class="btn">+ Добавить</button><div id="lR"></div></div>
 <div id="admBox" class="card" style="display:none"><b>👥 Пользователи (только для Админа)</b><input id="nL" placeholder="Логин" style="margin-top:8px"><input id="nP" placeholder="Пароль"><label style="font-size:12px;color:#666">Фото пользователя:</label><input type="file" id="nAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aU" class="btn bg">+ Добавить пользователя</button><div id="lU"></div></div>
+<div class="card copy"><b>ℹ️ О программе и авторе</b><br>© Все авторские права принадлежат:<br><b>Ахмадиеву Виктору Игоревичу</b><br>Телефон: <a href="tel:+79297890836">+79297890836</a><br>Почта: <a href="mailto:zarovshan@inbox.ru">zarovshan@inbox.ru</a><button type="button" class="btn btb" onclick="openDon()" style="margin-top:10px;margin-bottom:0">💛 Пожертвование на поддержку (Т-Банк)</button></div>
 </div>
 <div id="t5" class="pg"><div class="card"><b>👶 База учеников с фото</b><input id="iBK" placeholder="ФИО ученика" style="margin-top:8px"><input id="iBP" placeholder="Телефон"><label style="font-size:12px;color:#666">Фото ученика:</label><input type="file" id="iBAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aB" class="btn bg">+ Добавить в базу</button><div id="lB" style="margin-top:8px"></div></div></div>
 <div id="t2" class="pg act">
@@ -64,8 +73,30 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <div id="trip"></div>
 <button type="button" id="bCl" class="btn bo">Сбросить отметки</button>
 </div>
-<div id="t3" class="pg"><div id="rep"></div><div class="np"><button type="button" id="bPr" class="btn bd">🖨️ Печать</button><button type="button" id="bAr" class="btn bp">💾 В Архив</button><button type="button" id="bCp" class="btn bg">📋 Копировать</button></div></div>
+<div id="t3" class="pg"><div id="rep"></div><div class="np card"><b>📤 Отправить или сохранить отчет:</b>
+<button type="button" id="bSh" class="btn" style="margin-top:8px">📡 AirDrop / Bluetooth / MAX / Поделиться</button>
+<div class="sgrid">
+<button type="button" id="bTg" class="btn btg">✈️ Telegram</button>
+<button type="button" id="bWa" class="btn bwa">💬 WhatsApp</button>
+<button type="button" id="bEm" class="btn bo">✉️ На почту</button>
+<button type="button" id="bCp" class="btn bg">📋 Копировать</button>
+</div>
+<div class="sgrid" style="margin-top:0">
+<button type="button" id="bPr" class="btn bd">🖨️ Печать</button>
+<button type="button" id="bAr" class="btn bp">💾 В Архив</button>
+</div>
+</div></div>
 <div id="t4" class="pg"><div id="arch"></div></div>
+</div>
+<div id="donModal" class="modal" onclick="if(event.target===this)this.style.display='none'">
+<div class="mbox">
+<h3 style="margin-top:0">💛 Поддержка программы</h3>
+<p style="font-size:14px;color:#444;margin-bottom:8px">Перевод по номеру телефона на <b>Т-Банк</b><br>Получатель: <b>Ахмадиев Виктор Игоревич</b></p>
+<div style="background:#f2f2f7;padding:12px;border-radius:10px;font-size:18px;font-weight:bold;margin-bottom:10px">+79297890836</div>
+<button type="button" class="btn btb" onclick="cpPhone()">📋 Скопировать номер телефона</button>
+<a href="https://tbank.ru" target="_blank" class="btn bg" style="display:block;text-decoration:none;margin-bottom:6px">🏦 Открыть Т-Банк для перевода</a>
+<button type="button" class="btn" style="background:#8e8e93;margin-bottom:0" onclick="e('donModal').style.display='none'">Закрыть</button>
+</div>
 </div>
 <input type="file" id="updAv" accept="image/*" style="display:none">
 <div id="tst" class="msg"></div>
@@ -118,6 +149,22 @@ function p2(n) { return n < 10 ? "0" + n : "" + n; }
 function gD() { var n = new Date(); return p2(n.getDate()) + "." + p2(n.getMonth() + 1) + "." + n.getFullYear(); }
 function gT() { var n = new Date(); return p2(n.getHours()) + ":" + p2(n.getMinutes()); }
 setInterval(function() { if (e("clk")) e("clk").textContent = "📅 " + gD() + "  🕒 " + gT(); }, 1000);
+
+function copyTxt(str, msg) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(str).then(function() { nf(msg || "Скопировано"); }).catch(function() { fallbackCopy(str, msg); });
+  } else {
+    fallbackCopy(str, msg);
+  }
+}
+
+function fallbackCopy(str, msg) {
+  var ta = nd("textarea"); ta.value = str; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+  nf(msg || "Скопировано");
+}
+
+function openDon() { e("donModal").style.display = "flex"; }
+function cpPhone() { copyTxt("+79297890836", "Номер +79297890836 скопирован"); }
 
 function mkAv(src, name, sm) {
   if (src) {
@@ -334,7 +381,7 @@ e("b4").onclick = function() { tab(4); };
 e("b5").onclick = function() { tab(5); };
 
 e("iMyAv").onchange = function() {
-  var f = this.files && this.files[0];
+  var f = this.files && this.files;
   if (!f) return;
   resizeImg(f, function(b64) {
     db.u.forEach(function(u) { if (u.l === db.cu) u.av = b64; });
@@ -345,7 +392,7 @@ e("iMyAv").onchange = function() {
 
 var editAvTarget = null;
 e("updAv").onchange = function() {
-  var f = this.files && this.files[0];
+  var f = this.files && this.files;
   if (!f || !editAvTarget) return;
   resizeImg(f, function(b64) {
     if (editAvTarget.type === "u" && db.u[editAvTarget.idx]) db.u[editAvTarget.idx].av = b64;
@@ -372,7 +419,7 @@ e("aU").onclick = function() {
   var ex = 0;
   db.u.forEach(function(u) { if (u.l === l) ex = 1; });
   if (ex) return nf("Логин занят");
-  var f = e("nAv").files && e("nAv").files[0];
+  var f = e("nAv").files && e("nAv").files;
   resizeImg(f, function(b64) {
     db.u.push({ l: l, p: p, av: b64 });
     e("nL").value = ""; e("nP").value = ""; e("nAv").value = "";
@@ -383,7 +430,7 @@ e("aU").onclick = function() {
 e("aB").onclick = function() {
   var v = e("iBK").value.trim(), p = e("iBP").value.trim();
   if (!v) return nf("Введите ФИО ученика");
-  var f = e("iBAv").files && e("iBAv").files[0];
+  var f = e("iBAv").files && e("iBAv").files;
   resizeImg(f, function(b64) {
     db.b.push({ id: Date.now(), n: v, p: p, av: b64 });
     e("iBK").value = ""; e("iBP").value = ""; e("iBAv").value = "";
@@ -433,6 +480,15 @@ function mk(id, a) {
   sv();
 }
 
+function buildRepText() {
+  var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; });
+  var ln = ["Отчет " + gD() + " " + gT() + " | " + db.cr + " (" + db.cu + ")"];
+  fk.forEach(function(x, i) {
+    ln.push((i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")"));
+  });
+  return ln.join("\n");
+}
+
 e("bCl").onclick = function() {
   db.k.forEach(function(x) { if (!x.rt || x.rt === db.cr) { x.st = "none"; x.s1 = ""; x.t1 = ""; x.s2 = ""; x.t2 = ""; } });
   sv(); nf("Сброшено");
@@ -443,12 +499,31 @@ e("bAr").onclick = function() {
   db.a.unshift({ dt: gD(), tm: gT(), rt: db.cr, by: db.cu, k: JSON.parse(JSON.stringify(fk)) });
   sv(); nf("В Архиве");
 };
-e("bCp").onclick = function() {
-  var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; });
-  var ln = ["Отчет " + gD() + " " + gT() + " | " + db.cr + " (" + db.cu + ")"];
-  fk.forEach(function(x, i) { ln.push((i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")); });
-  var ta = nd("textarea"); ta.value = ln.join("\n"); document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
-  nf("Скопировано");
+e("bCp").onclick = function() { copyTxt(buildRepText(), "Отчет скопирован"); };
+
+e("bSh").onclick = function() {
+  var txt = buildRepText();
+  if (navigator.share) {
+    navigator.share({ title: "Отчет журнала автобуса", text: txt }).catch(function() {});
+  } else {
+    copyTxt(txt, "Текст скопирован (меню Поделиться не поддерживается в этом браузере)");
+  }
+};
+
+e("bTg").onclick = function() {
+  var txt = encodeURIComponent(buildRepText());
+  window.open("https://t.me" + txt, "_blank");
+};
+
+e("bWa").onclick = function() {
+  var txt = encodeURIComponent(buildRepText());
+  window.open("https://whatsapp.com" + txt, "_blank");
+};
+
+e("bEm").onclick = function() {
+  var subj = encodeURIComponent("Отчет журнала автобуса " + gD() + " (" + db.cr + ")");
+  var body = encodeURIComponent(buildRepText());
+  window.location.href = "mailto:?subject=" + subj + "&body=" + body;
 };
 
 function drw() {
