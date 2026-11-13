@@ -39,15 +39,18 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:1000}
 .mbox{background:#fff;border-radius:14px;padding:18px;max-width:360px;width:100%;text-align:center}
 .stlist{max-height:55vh;overflow-y:auto;margin:10px 0}
-.stopt{width:100%;padding:12px;border:1px solid #d1d1d6;border-radius:10px;background:#f9f9fb;font-size:16px;font-weight:bold;color:#1c1c1e;margin-bottom:8px;cursor:pointer}
+.stopt{width:100%;padding:12px;border:1px solid #d1d1d6;border-radius:10px;background:#f9f9fb;font-size:16px;font-weight:bold;color:#1c1c1e;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
 .stopt:active{background:#007aff;color:#fff;border-color:#007aff}
+.tbadge{background:#007aff18;color:#007aff;padding:3px 8px;border-radius:6px;font-size:13px;font-weight:bold}
+.inprow{display:flex;gap:8px;margin-top:8px}
+.inprow input[type="time"]{width:125px;flex-shrink:0}
 @media print{.nav,.np,.top,.clk,.msg,.sync,.cam,.sbtn,.modal{display:none!important}body{background:#fff;padding:0}.card{box-shadow:none;border:1px solid #ccc}.pg{display:none!important}#t3{display:block!important}}
 </style>
 </head>
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:30px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 37 (Выбор остановки в окне)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 38 (Расписание рейсов)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <div id="tokBox"><input id="uT" type="password" placeholder="Токен GitHub (ghp_...)"></div>
@@ -63,16 +66,16 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <div class="nav"><button type="button" id="b1">Настройка</button><button type="button" id="b5">База</button><button type="button" id="b2" class="act">Поездка</button><button type="button" id="b3">Отчет</button><button type="button" id="b4">Архив</button></div>
 <div id="t1" class="pg">
 <div class="card"><b>👤 Моя аватарка</b><div style="display:flex;align-items:center;gap:10px;margin-top:8px"><span id="myAv"></span><input type="file" id="iMyAv" accept="image/*" style="margin:0;padding:7px;font-size:13px"></div></div>
-<div class="card"><b>🚏 Остановки</b><input id="iS" placeholder="Название" style="margin-top:8px"><button type="button" id="aS" class="btn">+ Добавить</button><div id="lS"></div></div>
-<div class="card"><b>🔄 Рейсы</b><input id="iR" placeholder="Название" style="margin-top:8px"><button type="button" id="aR" class="btn">+ Добавить</button><div id="lR"></div></div>
+<div class="card"><b>🔄 Рейсы и время выезда</b><div class="inprow"><input id="iR" placeholder="Рейс (напр. Рейс №1)"><input id="iRT" type="time" title="Время выезда"></div><button type="button" id="aR" class="btn">+ Добавить рейс</button><div id="lR"></div></div>
+<div class="card"><b>🚏 Остановки и время по графику</b><div class="inprow"><input id="iS" placeholder="Остановка (напр. Школа)"><input id="iST" type="time" title="Время остановки"></div><button type="button" id="aS" class="btn">+ Добавить остановку</button><div id="lS"></div></div>
 <div id="admBox" class="card" style="display:none"><b>👥 Пользователи (только для Админа)</b><input id="nL" placeholder="Логин" style="margin-top:8px"><input id="nP" placeholder="Пароль"><label style="font-size:12px;color:#666">Фото пользователя:</label><input type="file" id="nAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aU" class="btn bg">+ Добавить пользователя</button><div id="lU"></div></div>
 <div id="admSchBox" class="card" style="display:none"><b>🏫 Школы и адреса (только для Админа)</b><input id="nSch" placeholder="Название школы" style="margin-top:8px"><input id="nAddr" placeholder="Адрес школы"><button type="button" id="aSch" class="btn bg">+ Добавить школу</button><div id="lSch"></div></div>
-<div class="card copy"><b>ℹ️ О программе и авторе</b><br>© Все авторские права принадлежат:<br><b>Ахмадиеву Виктору Игоревич</b><br>Телефон: <a href="tel:+79297890836">+79297890836</a><br>Почта: <a href="mailto:zarovshan@inbox.ru">zarovshan@inbox.ru</a><button type="button" class="btn btb" onclick="openDon()" style="margin-top:10px;margin-bottom:0">💛 Пожертвование на поддержку (Т-Банк)</button></div>
+<div class="card copy"><b>ℹ️ О программе и авторе</b><br>© Все авторские права принадлежат:<br><b>Ахмадиеву Виктору Игоревичу</b><br>Телефон: <a href="tel:+79297890836">+79297890836</a><br>Почта: <a href="mailto:zarovshan@inbox.ru">zarovshan@inbox.ru</a><button type="button" class="btn btb" onclick="openDon()" style="margin-top:10px;margin-bottom:0">💛 Пожертвование на поддержку (Т-Банк)</button></div>
 </div>
 <div id="t5" class="pg"><div class="card"><b>👶 База учеников с фото</b><input id="iBK" placeholder="ФИО ученика" style="margin-top:8px"><input id="iBP" placeholder="Телефон"><label style="font-size:12px;color:#666">Фото ученика:</label><input type="file" id="iBAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aB" class="btn bg">+ Добавить в базу</button><div id="lB" style="margin-top:8px"></div></div></div>
 <div id="t2" class="pg act">
 <div class="clk" id="clk"></div>
-<div class="card">Школа:<select id="schSel"></select>Рейс:<select id="rt"></select></div>
+<div class="card">Школа:<select id="schSel"></select>Рейс:<select id="rt"></select><div id="rtInfo" style="font-size:13px;color:#007aff;font-weight:bold;margin-top:-4px"></div></div>
 <div class="card"><b>Добавить из базы в поездку:</b><input id="fBase" placeholder="🔍 Поиск по ФИО..." style="margin-top:8px;margin-bottom:6px;padding:8px;font-size:14px"><div id="pickB" class="bpick"></div></div>
 <div id="trip"></div>
 <button type="button" id="bCl" class="btn bo">Сбросить отметки</button>
@@ -100,6 +103,16 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <button type="button" class="btn" style="background:#8e8e93;margin-bottom:0" onclick="e('stModal').style.display='none'">Отмена</button>
 </div>
 </div>
+<div id="tmModal" class="modal" onclick="if(event.target===this)this.style.display='none'">
+<div class="mbox">
+<h3 id="tmMTitle" style="margin-top:0;margin-bottom:6px">Время по графику</h3>
+<div id="tmMName" style="font-size:14px;color:#555;margin-bottom:10px"></div>
+<input id="tmMInp" type="time" style="font-size:18px;text-align:center">
+<button type="button" id="tmMSave" class="btn bg">Сохранить время</button>
+<button type="button" id="tmMClear" class="btn bo">Очистить время</button>
+<button type="button" class="btn" style="background:#8e8e93;margin-bottom:0" onclick="e('tmModal').style.display='none'">Отмена</button>
+</div>
+</div>
 <div id="donModal" class="modal" onclick="if(event.target===this)this.style.display='none'">
 <div class="mbox">
 <h3 style="margin-top:0">💛 Поддержка программы</h3>
@@ -116,7 +129,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 (function setupOfflineCache() {
   if (!("serviceWorker" in navigator)) return;
   var swCode = [
-    "var CACHE='bus-journal-v37';",
+    "var CACHE='bus-journal-v38';",
     "self.addEventListener('install',function(e){self.skipWaiting();});",
     "self.addEventListener('activate',function(e){e.waitUntil(clients.claim());});",
     "self.addEventListener('fetch',function(e){",
@@ -142,13 +155,14 @@ var gistId = localStorage.getItem(GIST_KEY) || "";
 var ADM = "zarovshan";
 var isSaving = false;
 var hasPendingSync = localStorage.getItem(DIRTY_KEY) === "1";
-var db = {u:[{l:"zarovshan",p:"VnIp159753",av:""}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],sc:[],csc:"",b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
-
+var db = {u:[{l:"zarovshan",p:"VnIp159753",av:""}],cu:null,s:["Остановка 1","Школа"],st:{},r:["Утро","Вечер"],rt:{},sc:[],csc:"",b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
 function mergeData(target, src) {
   if (!src || typeof src !== "object") return;
   if (Array.isArray(src.u) && src.u.length) target.u = src.u.map(function(u) { return Object.assign({ l: "", p: "", av: "" }, u); });
   if (Array.isArray(src.s)) target.s = src.s;
+  if (src.st && typeof src.st === "object") target.st = src.st;
   if (Array.isArray(src.r)) target.r = src.r;
+  if (src.rt && typeof src.rt === "object") target.rt = src.rt;
   if (Array.isArray(src.sc)) target.sc = src.sc.map(function(item) { return Object.assign({ id: Date.now(), n: "", addr: "" }, item); });
   if (src.csc !== undefined) target.csc = src.csc;
   if (Array.isArray(src.b)) target.b = src.b.map(function(b) { return Object.assign({ id: Date.now(), n: "", p: "", av: "" }, b); });
@@ -176,7 +190,6 @@ function mergeData(target, src) {
 
 var P1 = "https", P2 = "api", P3 = "github", P4 = "com", P5 = "gists";
 var BASE_URL = P1 + "://" + P2 + "." + P3 + "." + P4 + "/" + P5;
-
 function e(i) { return document.getElementById(i); }
 function nd(t, c, tx) { var d = document.createElement(t); if (c) d.className = c; if (tx !== undefined) d.textContent = tx; return d; }
 function nf(t) { var b = e("tst"); b.textContent = t; b.style.display = "block"; setTimeout(function() { b.style.display = "none"; }, 2500); }
@@ -210,7 +223,6 @@ function mkAv(src, name, sm) {
   }
   return nd("span", sm ? "av av-sm" : "av", (name || "?").charAt(0).toUpperCase());
 }
-
 function getFirstFile(inputEl) {
   if (!inputEl || !inputEl.files || !inputEl.files.length) return null;
   return inputEl.files.item(0);
@@ -236,6 +248,7 @@ function resizeImg(file, cb) {
   rd.onerror = function() { cb(""); };
   rd.readAsDataURL(file);
 }
+
 function setSt(txt, mode) {
   if (!e("cloudSt")) return;
   e("cloudSt").textContent = txt;
@@ -257,7 +270,6 @@ function ghHeaders() {
     "Content-Type": "application/json"
   };
 }
-
 function findOrCreateGist(cb) {
   if (gistId) { cb(gistId); return; }
   fetch(BASE_URL + "?per_page=100&t=" + Date.now(), { headers: ghHeaders() })
@@ -298,7 +310,6 @@ function findOrCreateGist(cb) {
       cb(null);
     });
 }
-
 function pushCloud(cb) {
   if (!GH_TOKEN) { if (cb) cb(false); return; }
   if (navigator.onLine === false) {
@@ -346,7 +357,6 @@ function pushCloud(cb) {
     });
   });
 }
-
 function pullCloud(cb, silent) {
   if (hasPendingSync) {
     pushCloud(function(ok) {
@@ -442,7 +452,6 @@ document.addEventListener("visibilitychange", function() {
     else pullCloud(function() { drw(); }, true);
   }
 });
-
 e("rstTok").onclick = function() {
   GH_TOKEN = "";
   localStorage.removeItem("gh_tok");
@@ -504,7 +513,6 @@ e("b2").onclick = function() { tab(2); };
 e("b3").onclick = function() { tab(3); };
 e("b4").onclick = function() { tab(4); };
 e("b5").onclick = function() { tab(5); };
-
 e("iMyAv").onchange = function() {
   var f = getFirstFile(this);
   if (!f) return;
@@ -532,10 +540,65 @@ e("updAv").onchange = function() {
   });
 };
 
+var editTimeTarget = null;
+function openTimeEdit(type, name) {
+  editTimeTarget = { type: type, name: name };
+  e("tmMTitle").textContent = type === "r" ? "🕒 Время выезда рейса" : "🕒 Время остановки";
+  e("tmMName").textContent = name;
+  var cur = type === "r" ? (db.rt && db.rt[name]) : (db.st && db.st[name]);
+  e("tmMInp").value = cur || "";
+  e("tmModal").style.display = "flex";
+}
+
+e("tmMSave").onclick = function() {
+  if (!editTimeTarget) return;
+  var val = e("tmMInp").value;
+  if (editTimeTarget.type === "r") {
+    if (!db.rt) db.rt = {};
+    if (val) db.rt[editTimeTarget.name] = val;
+    else delete db.rt[editTimeTarget.name];
+  } else {
+    if (!db.st) db.st = {};
+    if (val) db.st[editTimeTarget.name] = val;
+    else delete db.st[editTimeTarget.name];
+  }
+  e("tmModal").style.display = "none";
+  editTimeTarget = null;
+  sv(); nf("Время сохранено");
+};
+
+e("tmMClear").onclick = function() {
+  if (!editTimeTarget) return;
+  if (editTimeTarget.type === "r" && db.rt) delete db.rt[editTimeTarget.name];
+  if (editTimeTarget.type === "s" && db.st) delete db.st[editTimeTarget.name];
+  e("tmModal").style.display = "none";
+  editTimeTarget = null;
+  sv(); nf("Время убрано");
+};
 e("schSel").onchange = function() { db.csc = this.value; sv(); };
 e("rt").onchange = function() { db.cr = this.value; sv(); };
-e("aS").onclick = function() { var v = e("iS").value.trim(); if (v) { db.s.push(v); db.cs = v; e("iS").value = ""; sv(); nf("Добавлено"); } };
-e("aR").onclick = function() { var v = e("iR").value.trim(); if (v) { db.r.push(v); db.cr = v; e("iR").value = ""; sv(); nf("Добавлено"); } };
+
+e("aS").onclick = function() {
+  var v = e("iS").value.trim(), tm = e("iST").value;
+  if (!v) return;
+  if (db.s.indexOf(v) === -1) db.s.push(v);
+  if (!db.st) db.st = {};
+  if (tm) db.st[v] = tm;
+  db.cs = v;
+  e("iS").value = ""; e("iST").value = "";
+  sv(); nf("Остановка добавлена");
+};
+
+e("aR").onclick = function() {
+  var v = e("iR").value.trim(), tm = e("iRT").value;
+  if (!v) return;
+  if (db.r.indexOf(v) === -1) db.r.push(v);
+  if (!db.rt) db.rt = {};
+  if (tm) db.rt[v] = tm;
+  db.cr = v;
+  e("iR").value = ""; e("iRT").value = "";
+  sv(); nf("Рейс добавлен");
+};
 
 e("aSch").onclick = function() {
   if (db.cu !== ADM) return;
@@ -575,6 +638,7 @@ e("aB").onclick = function() {
 };
 
 e("fBase").oninput = function() { drwPick(); };
+
 function addFromBase(u) {
   db.k.push({ id: Date.now(), n: u.n, p: u.p, av: u.av || "", rt: db.cr, ta: gT(), st: "none", s1: "", t1: "", s2: "", t2: "", by: db.cu });
   sv(); nf("Добавлен в поездку");
@@ -614,8 +678,12 @@ function openStopPick(kidObj, action) {
   var box = e("stMList");
   box.innerHTML = "";
   db.s.forEach(function(stopName) {
-    var btn = nd("button", "stopt", stopName);
+    var btn = document.createElement("button");
     btn.type = "button";
+    btn.className = "stopt";
+    btn.appendChild(nd("span", "", stopName));
+    var planTm = db.st && db.st[stopName];
+    if (planTm) btn.appendChild(nd("span", "tbadge", "🕒 " + planTm));
     btn.onclick = function() {
       e("stModal").style.display = "none";
       mk(kidObj.id, action, stopName);
@@ -637,10 +705,15 @@ function mk(id, a, stopName) {
   sv();
 }
 
+function getRouteLabel(rName) {
+  var tm = db.rt && db.rt[rName];
+  return tm ? rName + " (выезд " + tm + ")" : rName;
+}
+
 function buildRepText() {
   var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; });
   var schTxt = db.csc ? "\nШкола: " + db.csc : "";
-  var ln = ["Отчет " + gD() + " " + gT() + " | " + db.cr + " (" + db.cu + ")" + schTxt];
+  var ln = ["Отчет " + gD() + " " + gT() + " | " + getRouteLabel(db.cr) + " (" + db.cu + ")" + schTxt];
   fk.forEach(function(x, i) {
     ln.push((i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")"));
   });
@@ -654,7 +727,7 @@ e("bCl").onclick = function() {
 e("bPr").onclick = function() { window.print(); };
 e("bAr").onclick = function() {
   var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; });
-  db.a.unshift({ dt: gD(), tm: gT(), rt: db.cr, sc: db.csc || "", by: db.cu, k: JSON.parse(JSON.stringify(fk)) });
+  db.a.unshift({ dt: gD(), tm: gT(), rt: getRouteLabel(db.cr), sc: db.csc || "", by: db.cu, k: JSON.parse(JSON.stringify(fk)) });
   sv(); nf("В Архиве");
 };
 e("bCp").onclick = function() { copyTxt(buildRepText(), "Отчет скопирован"); };
@@ -693,10 +766,43 @@ function drw() {
   var mav = e("myAv"); mav.innerHTML = "";
   mav.appendChild(mkAv(meObj.av, db.cu, false));
 
-  e("lS").innerHTML = "";
-  db.s.forEach(function(v, i) { var s = nd("span", "tag", v), x = nd("span", "dx", "✕"); x.onclick = function() { db.s.splice(i, 1); sv(); }; s.appendChild(x); e("lS").appendChild(s); });
   e("lR").innerHTML = "";
-  db.r.forEach(function(v, i) { var s = nd("span", "tag", v), x = nd("span", "dx", "✕"); x.onclick = function() { db.r.splice(i, 1); sv(); }; s.appendChild(x); e("lR").appendChild(s); });
+  db.r.forEach(function(v, i) {
+    var r = nd("div", "row");
+    var lf = nd("span", "uinfo");
+    lf.appendChild(nd("b", "", v));
+    var tm = db.rt && db.rt[v];
+    if (tm) lf.appendChild(nd("span", "tbadge", "выезд " + tm));
+    r.appendChild(lf);
+    var rt = nd("span", "");
+    var cm = nd("span", "cam", "🕒");
+    cm.onclick = function() { openTimeEdit("r", v); };
+    rt.appendChild(cm);
+    var x = nd("span", "dx", "✕");
+    x.onclick = function() { db.r.splice(i, 1); if (db.rt) delete db.rt[v]; sv(); };
+    rt.appendChild(x);
+    r.appendChild(rt);
+    e("lR").appendChild(r);
+  });
+
+  e("lS").innerHTML = "";
+  db.s.forEach(function(v, i) {
+    var r = nd("div", "row");
+    var lf = nd("span", "uinfo");
+    lf.appendChild(nd("span", "", v));
+    var tm = db.st && db.st[v];
+    if (tm) lf.appendChild(nd("span", "tbadge", tm));
+    r.appendChild(lf);
+    var rt = nd("span", "");
+    var cm = nd("span", "cam", "🕒");
+    cm.onclick = function() { openTimeEdit("s", v); };
+    rt.appendChild(cm);
+    var x = nd("span", "dx", "✕");
+    x.onclick = function() { db.s.splice(i, 1); if (db.st) delete db.st[v]; sv(); };
+    rt.appendChild(x);
+    r.appendChild(rt);
+    e("lS").appendChild(r);
+  });
 
   e("lU").innerHTML = "";
   e("lSch").innerHTML = "";
@@ -761,65 +867,64 @@ function drw() {
       var o = nd("option", "", lbl);
       o.value = lbl;
       scs.appendChild(o);
-      if (i === 0 && labels.indexOf(db.csc) === -1) db.csc = lbl;
-    });
-    scs.value = db.csc;
-  }
-
-  var sr = e("rt"); sr.innerHTML = "";
-  db.r.forEach(function(v, i) { sr.appendChild(nd("option", "", v)); if (i === 0 && db.r.indexOf(db.cr) === -1) db.cr = v; });
-  sr.value = db.cr;
-
-  var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; }), tr = e("trip"); tr.innerHTML = "";
-  fk.forEach(function(x) {
-    var bMatch = db.b.find(function(b) { return b.n === x.n; });
-    var avSrc = x.av || (bMatch ? bMatch.av : "");
-    var c = nd("div", "kid " + x.st), t = nd("div", "row"); t.style.border = 0;
-    var lf = nd("span", "uinfo");
-    lf.appendChild(mkAv(avSrc, x.n, false));
-    var tx = nd("span", "");
-    tx.appendChild(nd("b", "", x.n + " "));
-    if (x.ta) tx.appendChild(nd("small", "", "(" + x.ta + ") "));
-    if (x.p) { var a = nd("a", "", "📞"); a.href = "tel:" + x.p; tx.appendChild(a); }
-    lf.appendChild(tx);
-    t.appendChild(lf);
-    var dx = nd("span", "dx", "✕"); dx.onclick = function() { db.k = db.k.filter(function(y) { return y.id !== x.id; }); sv(); };
-    t.appendChild(dx); c.appendChild(t);
-    c.appendChild(nd("div", "", "Вход: " + (x.s1 || "-") + " (" + (x.t1 || "-") + ") | Выход: " + (x.s2 || "-") + " (" + (x.t2 || "-") + ")"));
-    var kb = nd("div", "kbtns"), b1 = nd("button", "bg", "Зашел"), b2 = nd("button", "", "Вышел"), b3 = nd("button", "br", "Нет");
-    b2.style.background = "#007aff";
-    b1.onclick = function() { openStopPick(x, "in"); };
-    b2.onclick = function() { openStopPick(x, "out"); };
-    b3.onclick = function() { mk(x.id, "abs"); };
-    kb.appendChild(b1); kb.appendChild(b2); kb.appendChild(b3);
-    c.appendChild(kb); tr.appendChild(c);
-  });
-
-  var rp = e("rep"); rp.innerHTML = "";
-  var rc = nd("div", "card");
-  rc.appendChild(nd("b", "", "Отчет " + gD() + " " + gT() + " | " + db.cr + " (" + db.cu + ")"));
-  if (db.csc) rc.appendChild(nd("div", "", "🏫 Школа: " + db.csc));
-  fk.forEach(function(x, i) {
-    rc.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")));
-  });
-  rp.appendChild(rc);
-
-  var ar = e("arch"); ar.innerHTML = "";
-  db.a.forEach(function(item, idx) {
-    var ac = nd("div", "card");
-    var hd = nd("div", "row");
-    hd.appendChild(nd("b", "", item.dt + " " + item.tm + " | " + item.rt));
-    var dl = nd("span", "dx", "✕"); dl.onclick = function() { db.a.splice(idx, 1); sv(); };
-    hd.appendChild(dl); ac.appendChild(hd);
-    if (item.sc) ac.appendChild(nd("div", "", "🏫 " + item.sc));
-    (item.k || []).forEach(function(x, i) {
-      ac.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")));
-    });
-    ar.appendChild(ac);
-  });
+if (i === 0 && labels.indexOf(db.csc) === -1) db.csc = lbl;
+});
+scs.value = db.csc;
 }
-
+var sr = e("rt"); sr.innerHTML = "";
+db.r.forEach(function(v, i) {
+var o = nd("option", "", getRouteLabel(v));
+o.value = v;
+sr.appendChild(o);
+if (i === 0 && db.r.indexOf(db.cr) === -1) db.cr = v;
+});
+sr.value = db.cr;
+var rTm = db.rt && db.rt[db.cr];
+e("rtInfo").textContent = rTm ? "🕒 Время выезда по графику: " + rTm : "";
+var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; }), tr = e("trip"); tr.innerHTML = "";
+fk.forEach(function(x) {
+var bMatch = db.b.find(function(b) { return b.n === x.n; });
+var avSrc = x.av || (bMatch ? bMatch.av : "");
+var c = nd("div", "kid " + x.st), t = nd("div", "row"); t.style.border = 0;
+var lf = nd("span", "uinfo");
+lf.appendChild(mkAv(avSrc, x.n, false));
+var tx = nd("span", "");
+tx.appendChild(nd("b", "", x.n + " "));
+if (x.ta) tx.appendChild(nd("small", "", "(" + x.ta + ") "));
+if (x.p) { var a = nd("a", "", "📞"); a.href = "tel:" + x.p; tx.appendChild(a); }
+lf.appendChild(tx);
+t.appendChild(lf);
+var dx = nd("span", "dx", "✕"); dx.onclick = function() { db.k = db.k.filter(function(y) { return y.id !== x.id; }); sv(); };
+t.appendChild(dx); c.appendChild(t);
+c.appendChild(nd("div", "", "Вход: " + (x.s1 || "-") + " (" + (x.t1 || "-") + ") | Выход: " + (x.s2 || "-") + " (" + (x.t2 || "-") + ")"));
+var kb = nd("div", "kbtns"), b1 = nd("button", "bg", "Зашел"), b2 = nd("button", "", "Вышел"), b3 = nd("button", "br", "Нет");
+b2.style.background = "#007aff";
+b1.onclick = function() { openStopPick(x, "in"); };
+b2.onclick = function() { openStopPick(x, "out"); };
+b3.onclick = function() { mk(x.id, "abs"); };
+kb.appendChild(b1); kb.appendChild(b2); kb.appendChild(b3);
+c.appendChild(kb); tr.appendChild(c);
+});
+var rp = e("rep"); rp.innerHTML = "";
+var rc = nd("div", "card");
+rc.appendChild(nd("b", "", "Отчет " + gD() + " " + gT() + " | " + getRouteLabel(db.cr) + " (" + db.cu + ")"));
+if (db.csc) rc.appendChild(nd("div", "", "🏫 Школа: " + db.csc));
+fk.forEach(function(x, i) {
+rc.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")));
+});
+rp.appendChild(rc);
+var ar = e("arch"); ar.innerHTML = "";
+db.a.forEach(function(item, idx) {
+var ac = nd("div", "card");
+var hd = nd("div", "row");
+hd.appendChild(nd("b", "", item.dt + " " + item.tm + " | " + item.rt));
+var dl = nd("span", "dx", "✕"); dl.onclick = function() { db.a.splice(idx, 1); sv(); };
+hd.appendChild(dl); ac.appendChild(hd);
+if (item.sc) ac.appendChild(nd("div", "", "🏫 " + item.sc));
+(item.k || []).forEach(function(x, i) {
+ac.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")));
+});
+ar.appendChild(ac);
+});
+}
 chk();
-</script>
-</body>
-</html>
