@@ -44,7 +44,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:30px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 35 (Школы и адреса)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 36 (Офлайн + Автосинхронизация)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <div id="tokBox"><input id="uT" type="password" placeholder="Токен GitHub (ghp_...)"></div>
@@ -56,7 +56,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 </div>
 <div id="app" style="display:none">
 <div class="top"><span id="cUBox" class="uinfo"></span><div><button type="button" id="bSync" style="border:0;background:#34c759;color:#fff;padding:5px 8px;border-radius:6px;font-weight:bold;margin-right:4px">🔄 Обновить</button><button type="button" id="bOut" style="border:0;background:#e5e5ea;padding:5px 10px;border-radius:6px;font-weight:bold">Выйти</button></div></div>
-<div id="cloudSt" class="sync">☁️ Проверка связи с GitHub...</div>
+<div id="cloudSt" class="sync">☁️ Проверка связи...</div>
 <div class="nav"><button type="button" id="b1">Настройка</button><button type="button" id="b5">База</button><button type="button" id="b2" class="act">Поездка</button><button type="button" id="b3">Отчет</button><button type="button" id="b4">Архив</button></div>
 <div id="t1" class="pg">
 <div class="card"><b>👤 Моя аватарка</b><div style="display:flex;align-items:center;gap:10px;margin-top:8px"><span id="myAv"></span><input type="file" id="iMyAv" accept="image/*" style="margin:0;padding:7px;font-size:13px"></div></div>
@@ -102,14 +102,35 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <input type="file" id="updAv" accept="image/*" style="display:none">
 <div id="tst" class="msg"></div>
 <script>
+(function setupOfflineCache() {
+  if (!("serviceWorker" in navigator)) return;
+  var swCode = [
+    "var CACHE='bus-journal-v36';",
+    "self.addEventListener('install',function(e){self.skipWaiting();});",
+    "self.addEventListener('activate',function(e){e.waitUntil(clients.claim());});",
+    "self.addEventListener('fetch',function(e){",
+    "  if(e.request.method!=='GET'||e.request.url.indexOf('://github.com')!==-1)return;",
+    "  e.respondWith(fetch(e.request).then(function(r){",
+    "    var cl=r.clone();caches.open(CACHE).then(function(c){c.put(e.request,cl);});return r;",
+    "  }).catch(function(){return caches.match(e.request);}));",
+    "});"
+  ].join("\n");
+  try {
+    var blob = new Blob([swCode], { type: "application/javascript" });
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function() {});
+  } catch (e) {}
+})();
+
 var GH_TOKEN = localStorage.getItem("gh_tok") || "";
 var DB_KEY = "bus_journal_main";
+var DIRTY_KEY = "bus_journal_dirty";
 var GIST_KEY = "gh_gist_main";
 var GIST_TAG = "bus_journal_db_main";
 var OLD_TAGS = ["bus_journal_db_main", "bus_journal_db_v30", "bus_journal_db_v29", "bus_journal_db_v28", "bus_journal_db_v27"];
 var gistId = localStorage.getItem(GIST_KEY) || "";
 var ADM = "zarovshan";
 var isSaving = false;
+var hasPendingSync = localStorage.getItem(DIRTY_KEY) === "1";
 var db = {u:[{l:"zarovshan",p:"VnIp159753",av:""}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],sc:[],csc:"",b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
 
 function mergeData(target, src) {
@@ -204,10 +225,18 @@ function resizeImg(file, cb) {
   rd.onerror = function() { cb(""); };
   rd.readAsDataURL(file);
 }
-function setSt(txt, ok) {
+function setSt(txt, mode) {
   if (!e("cloudSt")) return;
   e("cloudSt").textContent = txt;
-  e("cloudSt").style.color = ok ? "#34c759" : "#ff3b30";
+  e("cloudSt").style.color = mode === "err" ? "#ff3b30" : (mode === "warn" ? "#ff9500" : "#34c759");
+}
+
+function markDirty(flag) {
+  hasPendingSync = !!flag;
+  try {
+    if (hasPendingSync) localStorage.setItem(DIRTY_KEY, "1");
+    else localStorage.removeItem(DIRTY_KEY);
+  } catch (e) {}
 }
 
 function ghHeaders() {
@@ -249,21 +278,35 @@ function findOrCreateGist(cb) {
             localStorage.setItem(GIST_KEY, gistId);
             cb(gistId);
           }).catch(function(err) {
-            setSt("⚠️ Ошибка создания базы: " + err.message, false);
+            setSt("📴 Офлайн: нет сети для создания базы", "warn");
             cb(null);
           });
       }
     }).catch(function(err) {
-      setSt("⚠️ Ошибка GitHub: " + err.message, false);
+      setSt("📴 Офлайн-режим (ожидает сеть)", "warn");
       cb(null);
     });
 }
 
-function pushCloud() {
+function pushCloud(cb) {
+  if (!GH_TOKEN) { if (cb) cb(false); return; }
+  if (navigator.onLine === false) {
+    markDirty(true);
+    setSt("📴 Нет интернета — сохранено локально (отправится при появлении сети)", "warn");
+    if (cb) cb(false);
+    return;
+  }
+  if (isSaving) { if (cb) cb(false); return; }
   isSaving = true;
-  setSt("☁️ Сохранение в GitHub...", true);
+  setSt("☁️ Отправка данных в облако...", "ok");
   findOrCreateGist(function(id) {
-    if (!id) { isSaving = false; return; }
+    if (!id) {
+      isSaving = false;
+      markDirty(true);
+      setSt("📴 Нет связи — данные в очереди на отправку", "warn");
+      if (cb) cb(false);
+      return;
+    }
     var copy = JSON.parse(JSON.stringify(db));
     copy.cu = null;
     fetch(BASE_URL + "/" + id, {
@@ -275,23 +318,45 @@ function pushCloud() {
       })
     }).then(function(r) {
       isSaving = false;
-      if (r.ok) setSt("☁️ Сохранено в облаке (" + gT() + ")", true);
-      else setSt("⚠️ Ошибка записи: HTTP " + r.status, false);
-    }).catch(function(err) {
+      if (r.ok) {
+        markDirty(false);
+        setSt("☁️ Синхронизировано с облаком (" + gT() + ")", "ok");
+        if (cb) cb(true);
+      } else {
+        markDirty(true);
+        setSt("⚠️ Ошибка сервера: HTTP " + r.status + " (повторим позже)", "err");
+        if (cb) cb(false);
+      }
+    }).catch(function() {
       isSaving = false;
-      setSt("⚠️ Ошибка отправки: " + err.message, false);
+      markDirty(true);
+      setSt("📴 Нет интернета — сохранено в телефоне (отправится при сети)", "warn");
+      if (cb) cb(false);
     });
   });
 }
 
 function pullCloud(cb, silent) {
+  if (hasPendingSync) {
+    pushCloud(function(ok) {
+      if (ok && cb) cb();
+      else if (cb) cb();
+    });
+    return;
+  }
+  if (navigator.onLine === false) {
+    setSt("📴 Офлайн-режим (работа с локальной базой)", "warn");
+    if (cb) cb();
+    return;
+  }
   if (isSaving) { if (cb) cb(); return; }
-  if (!silent) setSt("☁️ Синхронизация...", true);
+  if (!silent) setSt("☁️ Синхронизация...", "ok");
   findOrCreateGist(function(id) {
     if (!id) { if (cb) cb(); return; }
     fetch(BASE_URL + "/" + id + "?t=" + Date.now(), { headers: ghHeaders() })
       .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function(g) {
+        if (hasPendingSync) { if (cb) cb(); return; }
         var raw = g.files && g.files["db.json"] ? g.files["db.json"].content : "";
         if (raw) {
           var data = JSON.parse(raw);
@@ -300,18 +365,19 @@ function pullCloud(cb, silent) {
             mergeData(db, data);
             db.cu = me;
             try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(err) {}
-            setSt("☁️ Синхронизировано (" + gT() + ")", true);
+            setSt("☁️ Синхронизировано (" + gT() + ")", "ok");
           }
         }
         if (cb) cb();
-      }).catch(function(err) {
-        setSt("⚠️ Нет связи: " + err.message, false);
+      }).catch(function() {
+        setSt("📴 Нет интернета — работаем автономно", "warn");
         if (cb) cb();
       });
   });
 }
 
 function sv() {
+  markDirty(true);
   try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(err) {}
   if (db.cu) drw();
   pushCloud();
@@ -331,18 +397,39 @@ function chk() {
     e("admBox").style.display = isAdm ? "block" : "none";
     e("admSchBox").style.display = isAdm ? "block" : "none";
     drw();
-    pullCloud(function() { drw(); });
+    if (hasPendingSync) pushCloud(function() { drw(); });
+    else pullCloud(function() { drw(); });
   } else {
     updTokUI();
   }
 }
 
+window.addEventListener("online", function() {
+  if (db.cu) {
+    nf("🌐 Интернет появился — отправка данных...");
+    if (hasPendingSync) pushCloud(function() { drw(); });
+    else pullCloud(function() { drw(); });
+  }
+});
+
+window.addEventListener("offline", function() {
+  if (db.cu) setSt("📴 Интернет пропал — все изменения сохраняются в телефон", "warn");
+});
+
 setInterval(function() {
-  if (db.cu && !document.hidden) pullCloud(function() { drw(); }, true);
-}, 10000);
+  if (!db.cu) return;
+  if (hasPendingSync) {
+    if (navigator.onLine !== false) pushCloud(function() { drw(); });
+  } else if (!document.hidden) {
+    pullCloud(function() { drw(); }, true);
+  }
+}, 8000);
 
 document.addEventListener("visibilitychange", function() {
-  if (!document.hidden && db.cu) pullCloud(function() { drw(); }, true);
+  if (!document.hidden && db.cu) {
+    if (hasPendingSync) pushCloud(function() { drw(); });
+    else pullCloud(function() { drw(); }, true);
+  }
 });
 
 e("rstTok").onclick = function() {
@@ -351,21 +438,36 @@ e("rstTok").onclick = function() {
   updTokUI();
 };
 
+function finishLogin(l) {
+  localStorage.setItem("gh_tok", GH_TOKEN);
+  updTokUI();
+  db.cu = l;
+  try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(err) {}
+  chk();
+}
+
 e("bLn").onclick = function() {
   var l = e("uL").value.trim(), p = e("uP").value.trim(), t = e("uT").value.trim();
   if (!GH_TOKEN && !t) return nf("Введите токен GitHub (ghp_...)");
   if (t) GH_TOKEN = t;
-  e("bLn").textContent = "Загрузка базы...";
+
+  var localOk = db.u.some(function(u) { return u.l === l && u.p === p; });
+  if (navigator.onLine === false) {
+    if (localOk) {
+      finishLogin(l);
+      nf("Вход выполнен без интернета");
+    } else {
+      nf("Нет интернета. Неверный логин или пароль");
+    }
+    return;
+  }
+
+  e("bLn").textContent = "Проверка...";
   pullCloud(function() {
     e("bLn").textContent = "Войти";
-    var ok = 0;
-    db.u.forEach(function(u) { if (u.l === l && u.p === p) ok = 1; });
+    var ok = db.u.some(function(u) { return u.l === l && u.p === p; });
     if (ok) {
-      localStorage.setItem("gh_tok", GH_TOKEN);
-      updTokUI();
-      db.cu = l;
-      try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(err) {}
-      chk();
+      finishLogin(l);
     } else {
       if (t) { GH_TOKEN = ""; updTokUI(); }
       nf("Неверный логин, пароль или токен");
@@ -374,7 +476,10 @@ e("bLn").onclick = function() {
 };
 
 e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(err) {} chk(); };
-e("bSync").onclick = function() { pullCloud(function() { drw(); nf("Обновлено"); }); };
+e("bSync").onclick = function() {
+  if (hasPendingSync) pushCloud(function(ok) { drw(); nf(ok ? "Данные отправлены в облако" : "Нет интернета, ждем сеть"); });
+  else pullCloud(function() { drw(); nf("Обновлено"); });
+};
 
 function tab(n) {
   for (var i = 1; i <= 5; i++) {
