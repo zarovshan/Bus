@@ -84,37 +84,28 @@ function pushCloud() {
   copy.cu = null;
   fetch(API_URL, {
     method: "POST",
+    mode: "no-cors",
     body: JSON.stringify(copy)
-  }).then(function(r) {
-    if (r.ok) setSt("☁️ Сохранено в Яндекс (" + gT() + ")", true);
-    else setSt("⚠️ Ошибка записи: HTTP " + r.status, false);
+  }).then(function() {
+    setSt("☁️ Отправлено в Яндекс (" + gT() + ")", true);
   }).catch(function(err) {
     setSt("⚠️ Ошибка отправки: " + err.message, false);
   });
 }
 
-function pullCloud(cb) {
-  setSt("☁️ Синхронизация с Яндекс...", true);
-  fetch(API_URL + "?nocache=" + Date.now() + "_" + Math.random())
-    .then(function(r) {
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      return r.json();
-    })
-    .then(function(data) {
-      if (data && data.u) {
-        var me = db.cu;
-        Object.assign(db, data);
-        db.cu = me;
-        try { localStorage.setItem("b_v24", JSON.stringify(db)); } catch(err) {}
-        setSt("☁️ Синхронизировано (" + gT() + ")", true);
-      } else {
-        setSt("☁️ База в облаке пуста (готова к записи)", true);
-      }
-      if (cb) cb();
-    }).catch(function(err) {
-      setSt("⚠️ Нет связи с Яндекс: " + err.message, false);
-      if (cb) cb();
-    });
+function pushCloud() {
+  setSt("☁️ Сохранение в Яндекс...", true);
+  var copy = JSON.parse(JSON.stringify(db));
+  copy.cu = null;
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify(copy)
+  }).then(function() {
+    setSt("☁️ Отправлено в Яндекс (" + gT() + ")", true);
+  }).catch(function(err) {
+    setSt("⚠️ Ошибка отправки: " + err.message, false);
+  });
 }
 
 function sv() {
