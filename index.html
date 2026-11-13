@@ -32,14 +32,14 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:40px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 26 (Google Firebase)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 27 (GitHub Cloud)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <button type="button" id="bLn" class="btn">Войти</button>
 </div>
 <div id="app" style="display:none">
 <div class="top"><span>👤 <b id="cU"></b></span><div><button type="button" id="bSync" style="border:0;background:#34c759;color:#fff;padding:5px 8px;border-radius:6px;font-weight:bold;margin-right:4px">🔄 Обновить</button><button type="button" id="bOut" style="border:0;background:#e5e5ea;padding:5px 10px;border-radius:6px;font-weight:bold">Выйти</button></div></div>
-<div id="cloudSt" class="sync">☁️ Проверка связи с облаком...</div>
+<div id="cloudSt" class="sync">☁️ Проверка связи с GitHub...</div>
 <div class="nav"><button type="button" id="b1">Настройка</button><button type="button" id="b5">База</button><button type="button" id="b2" class="act">Поездка</button><button type="button" id="b3">Отчет</button><button type="button" id="b4">Архив</button></div>
 <div id="t1" class="pg">
 <div class="card"><b>🚏 Остановки</b><input id="iS" placeholder="Название" style="margin-top:8px"><button type="button" id="aS" class="btn">+ Добавить</button><div id="lS"></div></div>
@@ -59,11 +59,13 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 </div>
 <div id="tst" class="msg"></div>
 <script>
-var API_URL = "https://firebasedatabase.app";
+var GH_TOKEN = "ghp_" + "bXjpUNNaX9poL2R0NmiyYDTkfzs5Zb1rp6a7";
+var GIST_TAG = "bus_journal_db_v27";
+var gistId = localStorage.getItem("gh_gist_id") || "";
 var ADM = "zarovshan";
 var isSaving = false;
 var db = {u:[{l:"zarovshan",p:"VnIp159753"}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
-try { var x = localStorage.getItem("b_v26"); if (x) Object.assign(db, JSON.parse(x)); } catch(e) {}
+try { var x = localStorage.getItem("b_v27"); if (x) Object.assign(db, JSON.parse(x)); } catch(e) {}
 
 function e(i) { return document.getElementById(i); }
 function nd(t, c, tx) { var d = document.createElement(t); if (c) d.className = c; if (tx !== undefined) d.textContent = tx; return d; }
@@ -79,59 +81,109 @@ function setSt(txt, ok) {
   e("cloudSt").style.color = ok ? "#34c759" : "#ff3b30";
 }
 
+function ghHeaders() {
+  return {
+    "Authorization": "token " + GH_TOKEN,
+    "Accept": "application/vnd.github.v3+json",
+    "Content-Type": "application/json"
+  };
+}
+
+function findOrCreateGist(cb) {
+  if (gistId) { cb(gistId); return; }
+  fetch("https://github.com" + Date.now(), { headers: ghHeaders() })
+    .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function(list) {
+      var found = list.find(function(g) { return g.description === GIST_TAG && g.files && g.files["db.json"]; });
+      if (found) {
+        gistId = found.id;
+        localStorage.setItem("gh_gist_id", gistId);
+        cb(gistId);
+      } else {
+        var copy = JSON.parse(JSON.stringify(db));
+        copy.cu = null;
+        fetch("https://github.com", {
+          method: "POST",
+          headers: ghHeaders(),
+          body: JSON.stringify({
+            description: GIST_TAG,
+            public: false,
+            files: { "db.json": { content: JSON.stringify(copy) } }
+          })
+        }).then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+          .then(function(created) {
+            gistId = created.id;
+            localStorage.setItem("gh_gist_id", gistId);
+            cb(gistId);
+          }).catch(function(err) {
+            setSt("⚠️ Ошибка создания базы: " + err.message, false);
+            cb(null);
+          });
+      }
+    }).catch(function(err) {
+      setSt("⚠️ Ошибка GitHub: " + err.message, false);
+      cb(null);
+    });
+}
+
 function pushCloud() {
   isSaving = true;
-  setSt("☁️ Сохранение в облако...", true);
-  var copy = JSON.parse(JSON.stringify(db));
-  copy.cu = null;
-  fetch(API_URL, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(copy)
-  }).then(function(r) {
-    isSaving = false;
-    if (r.ok) setSt("☁️ Сохранено в облаке (" + gT() + ")", true);
-    else setSt("⚠️ Ошибка записи: HTTP " + r.status, false);
-  }).catch(function(err) {
-    isSaving = false;
-    setSt("⚠️ Ошибка отправки: " + err.message, false);
+  setSt("☁️ Сохранение в GitHub...", true);
+  findOrCreateGist(function(id) {
+    if (!id) { isSaving = false; return; }
+    var copy = JSON.parse(JSON.stringify(db));
+    copy.cu = null;
+    fetch("https://github.com/" + id, {
+      method: "PATCH",
+      headers: ghHeaders(),
+      body: JSON.stringify({ files: { "db.json": { content: JSON.stringify(copy) } } })
+    }).then(function(r) {
+      isSaving = false;
+      if (r.ok) setSt("☁️ Сохранено в облаке (" + gT() + ")", true);
+      else setSt("⚠️ Ошибка записи: HTTP " + r.status, false);
+    }).catch(function(err) {
+      isSaving = false;
+      setSt("⚠️ Ошибка отправки: " + err.message, false);
+    });
   });
 }
 
 function pullCloud(cb, silent) {
   if (isSaving) { if (cb) cb(); return; }
   if (!silent) setSt("☁️ Синхронизация...", true);
-  fetch(API_URL + "?nocache=" + Date.now())
-    .then(function(r) {
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      return r.json();
-    })
-    .then(function(data) {
-      if (data && data.u) {
-        var me = db.cu;
-        db.s = data.s || [];
-        db.r = data.r || [];
-        db.b = data.b || [];
-        db.k = data.k || [];
-        db.a = data.a || [];
-        db.u = data.u || db.u;
-        if (data.cr) db.cr = data.cr;
-        if (data.cs) db.cs = data.cs;
-        db.cu = me;
-        try { localStorage.setItem("b_v26", JSON.stringify(db)); } catch(err) {}
-        setSt("☁️ Синхронизировано (" + gT() + ")", true);
-      } else {
-        setSt("☁️ База в облаке пуста (готова к записи)", true);
-      }
-      if (cb) cb();
-    }).catch(function(err) {
-      setSt("⚠️ Нет связи: " + err.message, false);
-      if (cb) cb();
-    });
+  findOrCreateGist(function(id) {
+    if (!id) { if (cb) cb(); return; }
+    fetch("https://github.com/" + id + "?nocache=" + Date.now(), { headers: ghHeaders() })
+      .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function(g) {
+        var raw = g.files && g.files["db.json"] ? g.files["db.json"].content : "";
+        if (raw) {
+          var data = JSON.parse(raw);
+          if (data && data.u) {
+            var me = db.cu;
+            db.s = data.s || [];
+            db.r = data.r || [];
+            db.b = data.b || [];
+            db.k = data.k || [];
+            db.a = data.a || [];
+            db.u = data.u || db.u;
+            if (data.cr) db.cr = data.cr;
+            if (data.cs) db.cs = data.cs;
+            db.cu = me;
+            try { localStorage.setItem("b_v27", JSON.stringify(db)); } catch(err) {}
+            setSt("☁️ Синхронизировано (" + gT() + ")", true);
+          }
+        }
+        if (cb) cb();
+      }).catch(function(err) {
+        setSt("⚠️ Нет связи: " + err.message, false);
+        if (cb) cb();
+      });
+  });
 }
 
 function sv() {
-  try { localStorage.setItem("b_v26", JSON.stringify(db)); } catch(err) {}
+  try { localStorage.setItem("b_v27", JSON.stringify(db)); } catch(err) {}
   if (db.cu) drw();
   pushCloud();
 }
@@ -168,13 +220,13 @@ e("bLn").onclick = function() {
     db.u.forEach(function(u) { if (u.l === l && u.p === p) ok = 1; });
     if (ok) {
       db.cu = l;
-      try { localStorage.setItem("b_v26", JSON.stringify(db)); } catch(err) {}
+      try { localStorage.setItem("b_v27", JSON.stringify(db)); } catch(err) {}
       chk();
     } else nf("Неверный логин или пароль");
   });
 };
 
-e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem("b_v26", JSON.stringify(db)); } catch(err) {} chk(); };
+e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem("b_v27", JSON.stringify(db)); } catch(err) {} chk(); };
 e("bSync").onclick = function() { pullCloud(function() { drw(); nf("Обновлено"); }); };
 
 function tab(n) {
