@@ -35,6 +35,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 28 (GitHub Cloud)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
+  <input id="uT" type="password" placeholder="Токен GitHub (ghp_...)">
 <button type="button" id="bLn" class="btn">Войти</button>
 </div>
 <div id="app" style="display:none">
@@ -59,7 +60,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 </div>
 <div id="tst" class="msg"></div>
 <script>
-var GH_TOKEN = "ghp_" + "ghp_i5P804YVVOCFcMKmM" + "gFA5OvfHhRU4M3ZSW9G";
+var GH_TOKEN = localStorage.getItem("gh_tok") || "";
 var GIST_TAG = "bus_journal_db_v28";
 var gistId = localStorage.getItem("gh_gist_id_v28") || "";
 var ADM = "zarovshan";
@@ -218,7 +219,9 @@ document.addEventListener("visibilitychange", function() {
 });
 
 e("bLn").onclick = function() {
-  var l = e("uL").value.trim(), p = e("uP").value.trim();
+  var l = e("uL").value.trim(), p = e("uP").value.trim(), t = e("uT").value.trim();
+  if (t) { GH_TOKEN = t; localStorage.setItem("gh_tok", t); }
+  if (!GH_TOKEN) return nf("Введите токен GitHub (ghp_...)");
   e("bLn").textContent = "Загрузка базы...";
   pullCloud(function() {
     e("bLn").textContent = "Войти";
