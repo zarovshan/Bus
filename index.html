@@ -32,7 +32,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:40px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 27 (GitHub Cloud)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 28 (GitHub Cloud)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <button type="button" id="bLn" class="btn">Войти</button>
@@ -59,13 +59,20 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 </div>
 <div id="tst" class="msg"></div>
 <script>
-var GH_TOKEN = "ghp_" + "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";
-var GIST_TAG = "bus_journal_db_v27";
-var gistId = localStorage.getItem("gh_gist_id") || "";
+var GH_TOKEN = "ghp_" + "ВАШ_НОВЫЙ_ТОКЕН";
+var GIST_TAG = "bus_journal_db_v28";
+var gistId = localStorage.getItem("gh_gist_id_v28") || "";
 var ADM = "zarovshan";
 var isSaving = false;
 var db = {u:[{l:"zarovshan",p:"VnIp159753"}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
-try { var x = localStorage.getItem("b_v27"); if (x) Object.assign(db, JSON.parse(x)); } catch(e) {}
+try { var x = localStorage.getItem("b_v28"); if (x) Object.assign(db, JSON.parse(x)); } catch(e) {}
+
+var P1 = "https";
+var P2 = "api";
+var P3 = "github";
+var P4 = "com";
+var P5 = "gists";
+var BASE_URL = P1 + "://" + P2 + "." + P3 + "." + P4 + "/" + P5;
 
 function e(i) { return document.getElementById(i); }
 function nd(t, c, tx) { var d = document.createElement(t); if (c) d.className = c; if (tx !== undefined) d.textContent = tx; return d; }
@@ -91,19 +98,18 @@ function ghHeaders() {
 
 function findOrCreateGist(cb) {
   if (gistId) { cb(gistId); return; }
-  var listUrl = "https://" + "://github.com" + Date.now();
-  fetch(listUrl, { headers: ghHeaders() })
+  fetch(BASE_URL + "?per_page=50&t=" + Date.now(), { headers: ghHeaders() })
     .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
     .then(function(list) {
       var found = list.find(function(g) { return g.description === GIST_TAG && g.files && g.files["db.json"]; });
       if (found) {
         gistId = found.id;
-        localStorage.setItem("gh_gist_id", gistId);
+        localStorage.setItem("gh_gist_id_v28", gistId);
         cb(gistId);
       } else {
         var copy = JSON.parse(JSON.stringify(db));
         copy.cu = null;
-        fetch("https://github.com", {
+        fetch(BASE_URL, {
           method: "POST",
           headers: ghHeaders(),
           body: JSON.stringify({
@@ -114,7 +120,7 @@ function findOrCreateGist(cb) {
         }).then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
           .then(function(created) {
             gistId = created.id;
-            localStorage.setItem("gh_gist_id", gistId);
+            localStorage.setItem("gh_gist_id_v28", gistId);
             cb(gistId);
           }).catch(function(err) {
             setSt("⚠️ Ошибка создания базы: " + err.message, false);
@@ -126,7 +132,6 @@ function findOrCreateGist(cb) {
       cb(null);
     });
 }
-
 function pushCloud() {
   isSaving = true;
   setSt("☁️ Сохранение в GitHub...", true);
@@ -134,8 +139,7 @@ function pushCloud() {
     if (!id) { isSaving = false; return; }
     var copy = JSON.parse(JSON.stringify(db));
     copy.cu = null;
-    var patchUrl = "https://github.com/" + id;
-    fetch(patchUrl, {
+    fetch(BASE_URL + "/" + id, {
       method: "PATCH",
       headers: ghHeaders(),
       body: JSON.stringify({ files: { "db.json": { content: JSON.stringify(copy) } } })
@@ -155,8 +159,7 @@ function pullCloud(cb, silent) {
   if (!silent) setSt("☁️ Синхронизация...", true);
   findOrCreateGist(function(id) {
     if (!id) { if (cb) cb(); return; }
-    var getUrl = "https://github.com/" + id + "?nocache=" + Date.now();
-    fetch(getUrl, { headers: ghHeaders() })
+    fetch(BASE_URL + "/" + id + "?t=" + Date.now(), { headers: ghHeaders() })
       .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function(g) {
         var raw = g.files && g.files["db.json"] ? g.files["db.json"].content : "";
@@ -173,7 +176,7 @@ function pullCloud(cb, silent) {
             if (data.cr) db.cr = data.cr;
             if (data.cs) db.cs = data.cs;
             db.cu = me;
-            try { localStorage.setItem("b_v27", JSON.stringify(db)); } catch(err) {}
+            try { localStorage.setItem("b_v28", JSON.stringify(db)); } catch(err) {}
             setSt("☁️ Синхронизировано (" + gT() + ")", true);
           }
         }
@@ -185,9 +188,8 @@ function pullCloud(cb, silent) {
   });
 }
 
-
 function sv() {
-  try { localStorage.setItem("b_v27", JSON.stringify(db)); } catch(err) {}
+  try { localStorage.setItem("b_v28", JSON.stringify(db)); } catch(err) {}
   if (db.cu) drw();
   pushCloud();
 }
@@ -224,13 +226,13 @@ e("bLn").onclick = function() {
     db.u.forEach(function(u) { if (u.l === l && u.p === p) ok = 1; });
     if (ok) {
       db.cu = l;
-      try { localStorage.setItem("b_v27", JSON.stringify(db)); } catch(err) {}
+      try { localStorage.setItem("b_v28", JSON.stringify(db)); } catch(err) {}
       chk();
     } else nf("Неверный логин или пароль");
   });
 };
 
-e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem("b_v27", JSON.stringify(db)); } catch(err) {} chk(); };
+e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem("b_v28", JSON.stringify(db)); } catch(err) {} chk(); };
 e("bSync").onclick = function() { pullCloud(function() { drw(); nf("Обновлено"); }); };
 
 function tab(n) {
