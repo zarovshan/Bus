@@ -14,7 +14,7 @@ body{font-family:-apple-system,sans-serif;background:#f2f2f7;margin:0;padding:12
 .pg{display:none}.pg.act{display:block}
 .card{background:#fff;padding:14px;border-radius:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
 input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radius:8px;font-size:16px;margin-bottom:10px;background:#fff}
-.btn{width:100%;padding:12px;border:0;border-radius:8px;font-size:15px;font-weight:bold;color:#fff;background:#007aff;margin-bottom:6px}
+.btn{width:100%;padding:12px;border:0;border-radius:8px;font-size:15px;font-weight:bold;color:#fff;background:#007aff;margin-bottom:6px;cursor:pointer}
 .bg{background:#34c759}.bo{background:#ff9500}.br{background:#ff3b30}.bp{background:#5856d6}.bd{background:#1c1c1e}
 .tag{display:inline-flex;align-items:center;gap:6px;background:#e5e5ea;padding:6px 10px;border-radius:6px;margin:3px;font-size:14px}
 .kid{background:#fff;padding:12px;border-radius:12px;margin-bottom:10px;border-left:5px solid #ccc}
@@ -23,7 +23,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 .clk{background:#007aff15;color:#007aff;padding:8px;border-radius:8px;font-weight:bold;text-align:center;margin-bottom:10px}
 .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px;color:#555}
 .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #eee}
-.dx{color:#ff3b30;font-weight:bold;padding:2px 6px}
+.dx{color:#ff3b30;font-weight:bold;padding:2px 6px;cursor:pointer}
 .msg{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;display:none;z-index:999}
 .sync{font-size:12px;text-align:center;margin-bottom:8px;color:#34c759;font-weight:bold}
 @media print{.nav,.np,.top,.clk,.msg,.sync{display:none!important}body{background:#fff;padding:0}.card{box-shadow:none;border:1px solid #ccc}.pg{display:none!important}#t3{display:block!important}}
@@ -32,14 +32,14 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:40px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#ff9500;margin-bottom:10px">Версия 17 (синхронизация...)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 24 (Яндекс Облако)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <button type="button" id="bLn" class="btn">Войти</button>
 </div>
 <div id="app" style="display:none">
 <div class="top"><span>👤 <b id="cU"></b></span><div><button type="button" id="bSync" style="border:0;background:#34c759;color:#fff;padding:5px 8px;border-radius:6px;font-weight:bold;margin-right:4px">🔄 Обновить</button><button type="button" id="bOut" style="border:0;background:#e5e5ea;padding:5px 10px;border-radius:6px;font-weight:bold">Выйти</button></div></div>
-<div id="cloudSt" class="sync">☁️ Яндекс Облако подключено</div>
+<div id="cloudSt" class="sync">☁️ Проверка связи с Яндекс...</div>
 <div class="nav"><button type="button" id="b1">Настройка</button><button type="button" id="b5">База</button><button type="button" id="b2" class="act">Поездка</button><button type="button" id="b3">Отчет</button><button type="button" id="b4">Архив</button></div>
 <div id="t1" class="pg">
 <div class="card"><b>🚏 Остановки</b><input id="iS" placeholder="Название" style="margin-top:8px"><button type="button" id="aS" class="btn">+ Добавить</button><div id="lS"></div></div>
@@ -59,51 +59,243 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 </div>
 <div id="tst" class="msg"></div>
 <script>
-var URL="functions.yandexcloud.net/d4eo3msgosg6ng0vr3k6";
-var ADM="zarovshan",db={u:[{l:"zarovshan",p:"VnIp159753"}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
-try{var x=localStorage.getItem("b_v22");if(x)Object.assign(db,JSON.parse(x))}catch(e){}
-function e(i){return document.getElementById(i)}
-function nd(t,c,tx){var d=document.createElement(t);if(c)d.className=c;if(tx!==undefined)d.textContent=tx;return d}
-function nf(t){var b=e("tst");b.textContent=t;b.style.display="block";setTimeout(function(){b.style.display="none"},2500)}
-function p2(n){return n<10?"0"+n:""+n}
-function gD(){var n=new Date();return p2(n.getDate())+"."+p2(n.getMonth()+1)+"."+n.getFullYear()}
-function gT(){var n=new Date();return p2(n.getHours())+":"+p2(n.getMinutes())}
-setInterval(function(){if(e("clk"))e("clk").textContent="📅 "+gD()+"  🕒 "+gT()},1000);
-function pushCloud(){if(!URL||URL.indexOf("ВПИШИТЕ")!==-1)return;if(e("cloudSt"))e("cloudSt").textContent="☁️ Сохранение в Яндекс...";var copy=JSON.parse(JSON.stringify(db));copy.cu=null;fetch(URL,{method:"POST",body:JSON.stringify(copy)}).then(function(r){if(e("cloudSt"))e("cloudSt").textContent=r.ok?"☁️ Сохранено в Яндекс ("+gT()+")":"⚠️ Ошибка записи: "+r.status}).catch(function(err){if(e("cloudSt"))e("cloudSt").textContent="⚠️ Ошибка сети: "+err.message})}
-function pullCloud(cb){if(!URL||URL.indexOf("ВПИШИТЕ")!==-1){if(cb)cb();return}fetch(URL+"?nocache="+Date.now()+"_"+Math.random()).then(function(r){return r.ok?r.json():null}).then(function(data){if(data&&data.u){var me=db.cu;Object.assign(db,data);db.cu=me;try{localStorage.setItem("b_v22",JSON.stringify(db))}catch(err){}if(e("cloudSt"))e("cloudSt").textContent="☁️ Синхронизировано ("+gT()+")"}else{if(e("cloudSt"))e("cloudSt").textContent="☁️ База готова к работе"}if(cb)cb()}).catch(function(){if(e("cloudSt"))e("cloudSt").textContent="⚠️ Нет связи с Яндекс";if(cb)cb()})}
-function sv(){try{localStorage.setItem("b_v22",JSON.stringify(db))}catch(err){}if(db.cu)drw();pushCloud()}
-function chk(){e("auth").style.display=db.cu?"none":"block";e("app").style.display=db.cu?"block":"none";if(db.cu){e("cU").textContent=db.cu+(db.cu===ADM?" (Админ)":"");e("admBox").style.display=db.cu===ADM?"block":"none";drw()}}
-e("bLn").onclick=function(){var l=e("uL").value.trim(),p=e("uP").value.trim();e("bLn").textContent="Загрузка базы...";pullCloud(function(){e("bLn").textContent="Войти";var ok=0;db.u.forEach(function(u){if(u.l===l&&u.p===p)ok=1});if(ok){db.cu=l;try{localStorage.setItem("b_v22",JSON.stringify(db))}catch(err){}chk()}else nf("Неверный логин или пароль")})};
-e("bOut").onclick=function(){db.cu=null;try{localStorage.setItem("b_v22",JSON.stringify(db))}catch(err){}chk()};
-e("bSync").onclick=function(){if(e("cloudSt"))e("cloudSt").textContent="🔄 Обновление...";pullCloud(function(){drw();nf("Обновлено")})};
-function tab(n){for(var i=1;i<=5;i++){e("t"+i).className=i===n?"pg act":"pg";e("b"+i).className=i===n?"act":""}drw()}
-e("b1").onclick=function(){tab(1)};e("b2").onclick=function(){tab(2)};e("b3").onclick=function(){tab(3)};e("b4").onclick=function(){tab(4)};e("b5").onclick=function(){tab(5)};
-e("rt").onchange=function(){db.cr=this.value;sv()};e("st").onchange=function(){db.cs=this.value;sv()};
-e("aS").onclick=function(){var v=e("iS").value.trim();if(v){db.s.push(v);db.cs=v;e("iS").value="";sv();nf("Добавлено")}};
-e("aR").onclick=function(){var v=e("iR").value.trim();if(v){db.r.push(v);db.cr=v;e("iR").value="";sv();nf("Добавлено")}};
-e("aU").onclick=function(){if(db.cu!==ADM)return;var l=e("nL").value.trim(),p=e("nP").value.trim();if(!l||!p)return nf("Введите данные");var ex=0;db.u.forEach(function(u){if(u.l===l)ex=1});if(ex)return nf("Логин занят");db.u.push({l:l,p:p});e("nL").value="";e("nP").value="";sv();nf("Пользователь добавлен")};
-e("aB").onclick=function(){var v=e("iBK").value.trim(),p=e("iBP").value.trim();if(v){db.b.push({id:Date.now(),n:v,p:p});e("iBK").value="";e("iBP").value="";sv();nf("В базе")}};
-e("aFB").onclick=function(){var i=e("selB").value;if(i!==""){var u=db.b[Number(i)];if(u){db.k.push({id:Date.now(),n:u.n,p:u.p,rt:db.cr,ta:gT(),st:"none",s1:"",t1:"",s2:"",t2:"",by:db.cu});sv();nf("В поездке")}}};
-function mk(id,a){var s=db.cs||e("st").value,t=gT();db.k.forEach(function(x){if(x.id===id){if(a==="in"){x.st="in";x.s1=s;x.t1=t;x.s2="";x.t2=""}else if(a==="out"){x.st="out";x.s2=s;x.t2=t}else{x.st="abs";x.s1="";x.t1="";x.s2="";x.t2=""}}});sv()}
-e("bCl").onclick=function(){db.k.forEach(function(x){if(!x.rt||x.rt===db.cr){x.st="none";x.s1="";x.t1="";x.s2="";x.t2=""}});sv();nf("Сброшено")};
-e("bPr").onclick=function(){window.print()};
-e("bAr").onclick=function(){var fk=db.k.filter(function(x){return!x.rt||x.rt===db.cr});db.a.unshift({dt:gD(),tm:gT(),rt:db.cr,by:db.cu,k:JSON.parse(JSON.stringify(fk))});sv();nf("В Архиве")};
-e("bCp").onclick=function(){var fk=db.k.filter(function(x){return!x.rt||x.rt===db.cr}),ln=["Отчет "+gD()+" "+gT()+" | "+db.cr+" ("+db.cu+")"];fk.forEach(function(x,i){ln.push((i+1)+". "+x.n+": "+(x.st==="abs"?"Нет":x.s1+"("+x.t1+")-"+(x.s2||"путь")+"("+x.t2+")"))});var ta=nd("textarea");ta.value=ln.join(String.fromCharCode(10));document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);nf("Скопировано")};
-function drw(){
-e("lS").innerHTML="";db.s.forEach(function(v,i){var s=nd("span","tag",v),x=nd("span","dx","✕");x.onclick=function(){db.s.splice(i,1);sv()};s.appendChild(x);e("lS").appendChild(s)});
-e("lR").innerHTML="";db.r.forEach(function(v,i){var s=nd("span","tag",v),x=nd("span","dx","✕");x.onclick=function(){db.r.splice(i,1);sv()};s.appendChild(x);e("lR").appendChild(s)});
-e("lU").innerHTML="";if(db.cu===ADM){db.u.forEach(function(u,i){var r=nd("div","row");r.appendChild(nd("span","",u.l+" ("+u.p+")"));if(u.l!==ADM){var x=nd("span","dx","✕");x.onclick=function(){db.u.splice(i,1);sv()};r.appendChild(x)}e("lU").appendChild(r)})}
-e("lB").innerHTML="";db.b.forEach(function(u,i){var r=nd("div","row");r.appendChild(nd("span","",(i+1)+". "+u.n+" "+u.p));var x=nd("span","dx","✕");x.onclick=function(){db.b.splice(i,1);sv()};r.appendChild(x);e("lB").appendChild(r)});
-var sb=e("selB");sb.innerHTML="";db.b.forEach(function(u,i){var o=nd("option","",u.n);o.value=i;sb.appendChild(o)});
-var sr=e("rt");sr.innerHTML="";db.r.forEach(function(v,i){sr.appendChild(nd("option","",v));if(i===0&&db.r.indexOf(db.cr)===-1)db.cr=v});sr.value=db.cr;
-var ss=e("st");ss.innerHTML="";db.s.forEach(function(v,i){ss.appendChild(nd("option","",v));if(i===0&&db.s.indexOf(db.cs)===-1)db.cs=v});ss.value=db.cs;
-var fk=db.k.filter(function(x){return!x.rt||x.rt===db.cr}),tr=e("trip");tr.innerHTML="";
-fk.forEach(function(x){var c=nd("div","kid "+x.st),t=nd("div","row");t.style.border=0;var lf=nd("span","");lf.appendChild(nd("b","",x.n+" "));if(x.ta)lf.appendChild(nd("small","","("+x.ta+") "));if(x.p){var a=nd("a","","📞");a.href="tel:"+x.p;lf.appendChild(a)}t.appendChild(lf);var dx=nd("span","dx","✕");dx.onclick=function(){db.k=db.k.filter(function(y){return y.id!==x.id});sv()};t.appendChild(dx);c.appendChild(t);c.appendChild(nd("div","","Вход: "+(x.s1||"-")+" ("+(x.t1||"-")+") | Выход: "+(x.s2||"-")+" ("+(x.t2||"-")+")"));var kb=nd("div","kbtns"),b1=nd("button","bg","Зашел"),b2=nd("button","","Вышел"),b3=nd("button","br","Нет");b2.style.background="#007aff";b1.onclick=function(){mk(x.id,"in")};b2.onclick=function(){mk(x.id,"out")};b3.onclick=function(){mk(x.id,"abs")};kb.appendChild(b1);kb.appendChild(b2);kb.appendChild(b3);c.appendChild(kb);tr.appendChild(c)});
-var rp=e("rep");rp.innerHTML="";var rc=nd("div","card");rc.appendChild(nd("b","","Отчет "+gD()+" "+gT()+" | "+db.cr+" ("+db.cu+")"));fk.forEach(function(x,i){rc.appendChild(nd("div","",(i+1)+". "+x.n+": "+(x.st==="abs"?"Нет":x.s1+"("+x.t1+")-"+(x.s2||"путь")+"("+x.t2+")")))});rp.appendChild(rc);
-var ar=e("arch");ar.innerHTML="";db.a.forEach(function(x,i){var ac=nd("div","card"),at=nd("div","row");at.style.border=0;at.appendChild(nd("b","",x.dt+" "+x.tm+" "+x.rt+" ("+x.by+")"));var dx=nd("span","dx","✕");dx.onclick=function(){db.a.splice(i,1);sv()};at.appendChild(dx);ac.appendChild(at);x.k.forEach(function(y,j){ac.appendChild(nd("div","",(j+1)+". "+y.n+": "+(y.st==="abs"?"Нет":y.s1+"-"+y.s2)))});ar.appendChild(ac)});
-}
-pullCloud(function(){if(e("vs")){e("vs").textContent="Версия 22 (готова)";e("vs").style.color="#34c759"}chk()});
-</script>
+var API_URL = "https://yandexcloud.net";
+var ADM = "zarovshan";
+var db = {u:[{l:"zarovshan",p:"VnIp159753"}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
+try { var x = localStorage.getItem("b_v24"); if (x) Object.assign(db, JSON.parse(x)); } catch(e) {}
 
+function e(i) { return document.getElementById(i); }
+function nd(t, c, tx) { var d = document.createElement(t); if (c) d.className = c; if (tx !== undefined) d.textContent = tx; return d; }
+function nf(t) { var b = e("tst"); b.textContent = t; b.style.display = "block"; setTimeout(function() { b.style.display = "none"; }, 2500); }
+function p2(n) { return n < 10 ? "0" + n : "" + n; }
+function gD() { var n = new Date(); return p2(n.getDate()) + "." + p2(n.getMonth() + 1) + "." + n.getFullYear(); }
+function gT() { var n = new Date(); return p2(n.getHours()) + ":" + p2(n.getMinutes()); }
+setInterval(function() { if (e("clk")) e("clk").textContent = "📅 " + gD() + "  🕒 " + gT(); }, 1000);
+
+function setSt(txt, ok) {
+  if (!e("cloudSt")) return;
+  e("cloudSt").textContent = txt;
+  e("cloudSt").style.color = ok ? "#34c759" : "#ff3b30";
+}
+
+function pushCloud() {
+  setSt("☁️ Сохранение в Яндекс...", true);
+  var copy = JSON.parse(JSON.stringify(db));
+  copy.cu = null;
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify(copy)
+  }).then(function(r) {
+    if (r.ok) setSt("☁️ Сохранено в Яндекс (" + gT() + ")", true);
+    else setSt("⚠️ Ошибка записи: HTTP " + r.status, false);
+  }).catch(function(err) {
+    setSt("⚠️ Ошибка отправки: " + err.message, false);
+  });
+}
+
+function pullCloud(cb) {
+  setSt("☁️ Синхронизация с Яндекс...", true);
+  fetch(API_URL + "?nocache=" + Date.now() + "_" + Math.random())
+    .then(function(r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      if (data && data.u) {
+        var me = db.cu;
+        Object.assign(db, data);
+        db.cu = me;
+        try { localStorage.setItem("b_v24", JSON.stringify(db)); } catch(err) {}
+        setSt("☁️ Синхронизировано (" + gT() + ")", true);
+      } else {
+        setSt("☁️ База в облаке пуста (готова к записи)", true);
+      }
+      if (cb) cb();
+    }).catch(function(err) {
+      setSt("⚠️ Нет связи с Яндекс: " + err.message, false);
+      if (cb) cb();
+    });
+}
+
+function sv() {
+  try { localStorage.setItem("b_v24", JSON.stringify(db)); } catch(err) {}
+  if (db.cu) drw();
+  pushCloud();
+}
+
+function chk() {
+  e("auth").style.display = db.cu ? "none" : "block";
+  e("app").style.display = db.cu ? "block" : "none";
+  if (db.cu) {
+    e("cU").textContent = db.cu + (db.cu === ADM ? " (Админ)" : "");
+    e("admBox").style.display = db.cu === ADM ? "block" : "none";
+    drw();
+    pullCloud(function() { drw(); });
+  }
+}
+
+e("bLn").onclick = function() {
+  var l = e("uL").value.trim(), p = e("uP").value.trim();
+  e("bLn").textContent = "Загрузка базы...";
+  pullCloud(function() {
+    e("bLn").textContent = "Войти";
+    var ok = 0;
+    db.u.forEach(function(u) { if (u.l === l && u.p === p) ok = 1; });
+    if (ok) {
+      db.cu = l;
+      try { localStorage.setItem("b_v24", JSON.stringify(db)); } catch(err) {}
+      chk();
+    } else nf("Неверный логин или пароль");
+  });
+};
+
+e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem("b_v24", JSON.stringify(db)); } catch(err) {} chk(); };
+e("bSync").onclick = function() { pullCloud(function() { drw(); nf("Обновлено"); }); };
+
+function tab(n) {
+  for (var i = 1; i <= 5; i++) {
+    e("t" + i).className = i === n ? "pg act" : "pg";
+    e("b" + i).className = i === n ? "act" : "";
+  }
+  drw();
+}
+e("b1").onclick = function() { tab(1); };
+e("b2").onclick = function() { tab(2); };
+e("b3").onclick = function() { tab(3); };
+e("b4").onclick = function() { tab(4); };
+e("b5").onclick = function() { tab(5); };
+
+e("rt").onchange = function() { db.cr = this.value; sv(); };
+e("st").onchange = function() { db.cs = this.value; sv(); };
+e("aS").onclick = function() { var v = e("iS").value.trim(); if (v) { db.s.push(v); db.cs = v; e("iS").value = ""; sv(); nf("Добавлено"); } };
+e("aR").onclick = function() { var v = e("iR").value.trim(); if (v) { db.r.push(v); db.cr = v; e("iR").value = ""; sv(); nf("Добавлено"); } };
+e("aU").onclick = function() {
+  if (db.cu !== ADM) return;
+  var l = e("nL").value.trim(), p = e("nP").value.trim();
+  if (!l || !p) return nf("Введите данные");
+  var ex = 0;
+  db.u.forEach(function(u) { if (u.l === l) ex = 1; });
+  if (ex) return nf("Логин занят");
+  db.u.push({ l: l, p: p });
+  e("nL").value = ""; e("nP").value = "";
+  sv(); nf("Пользователь добавлен");
+};
+e("aB").onclick = function() {
+  var v = e("iBK").value.trim(), p = e("iBP").value.trim();
+  if (v) { db.b.push({ id: Date.now(), n: v, p: p }); e("iBK").value = ""; e("iBP").value = ""; sv(); nf("В базе"); }
+};
+e("aFB").onclick = function() {
+  var i = e("selB").value;
+  if (i !== "") {
+    var u = db.b[Number(i)];
+    if (u) {
+      db.k.push({ id: Date.now(), n: u.n, p: u.p, rt: db.cr, ta: gT(), st: "none", s1: "", t1: "", s2: "", t2: "", by: db.cu });
+      sv(); nf("В поездке");
+    }
+  }
+};
+function mk(id, a) {
+  var s = db.cs || e("st").value, t = gT();
+  db.k.forEach(function(x) {
+    if (x.id === id) {
+      if (a === "in") { x.st = "in"; x.s1 = s; x.t1 = t; x.s2 = ""; x.t2 = ""; }
+      else if (a === "out") { x.st = "out"; x.s2 = s; x.t2 = t; }
+      else { x.st = "abs"; x.s1 = ""; x.t1 = ""; x.s2 = ""; x.t2 = ""; }
+    }
+  });
+  sv();
+}
+
+e("bCl").onclick = function() {
+  db.k.forEach(function(x) { if (!x.rt || x.rt === db.cr) { x.st = "none"; x.s1 = ""; x.t1 = ""; x.s2 = ""; x.t2 = ""; } });
+  sv(); nf("Сброшено");
+};
+e("bPr").onclick = function() { window.print(); };
+e("bAr").onclick = function() {
+  var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; });
+  db.a.unshift({ dt: gD(), tm: gT(), rt: db.cr, by: db.cu, k: JSON.parse(JSON.stringify(fk)) });
+  sv(); nf("В Архиве");
+};
+e("bCp").onclick = function() {
+  var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; });
+  var ln = ["Отчет " + gD() + " " + gT() + " | " + db.cr + " (" + db.cu + ")"];
+  fk.forEach(function(x, i) { ln.push((i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")); });
+  var ta = nd("textarea"); ta.value = ln.join("\n"); document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+  nf("Скопировано");
+};
+
+function drw() {
+  e("lS").innerHTML = "";
+  db.s.forEach(function(v, i) { var s = nd("span", "tag", v), x = nd("span", "dx", "✕"); x.onclick = function() { db.s.splice(i, 1); sv(); }; s.appendChild(x); e("lS").appendChild(s); });
+  e("lR").innerHTML = "";
+  db.r.forEach(function(v, i) { var s = nd("span", "tag", v), x = nd("span", "dx", "✕"); x.onclick = function() { db.r.splice(i, 1); sv(); }; s.appendChild(x); e("lR").appendChild(s); });
+  e("lU").innerHTML = "";
+  if (db.cu === ADM) {
+    db.u.forEach(function(u, i) {
+      var r = nd("div", "row");
+      r.appendChild(nd("span", "", u.l + " (" + u.p + ")"));
+      if (u.l !== ADM) { var x = nd("span", "dx", "✕"); x.onclick = function() { db.u.splice(i, 1); sv(); }; r.appendChild(x); }
+      e("lU").appendChild(r);
+    });
+  }
+  e("lB").innerHTML = "";
+  db.b.forEach(function(u, i) {
+    var r = nd("div", "row");
+    r.appendChild(nd("span", "", (i + 1) + ". " + u.n + " " + u.p));
+    var x = nd("span", "dx", "✕"); x.onclick = function() { db.b.splice(i, 1); sv(); };
+    r.appendChild(x); e("lB").appendChild(r);
+  });
+  var sb = e("selB"); sb.innerHTML = "";
+  db.b.forEach(function(u, i) { var o = nd("option", "", u.n); o.value = i; sb.appendChild(o); });
+  var sr = e("rt"); sr.innerHTML = "";
+  db.r.forEach(function(v, i) { sr.appendChild(nd("option", "", v)); if (i === 0 && db.r.indexOf(db.cr) === -1) db.cr = v; });
+  sr.value = db.cr;
+  var ss = e("st"); ss.innerHTML = "";
+  db.s.forEach(function(v, i) { ss.appendChild(nd("option", "", v)); if (i === 0 && db.s.indexOf(db.cs) === -1) db.cs = v; });
+  ss.value = db.cs;
+
+  var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; }), tr = e("trip"); tr.innerHTML = "";
+  fk.forEach(function(x) {
+    var c = nd("div", "kid " + x.st), t = nd("div", "row"); t.style.border = 0;
+    var lf = nd("span", ""); lf.appendChild(nd("b", "", x.n + " "));
+    if (x.ta) lf.appendChild(nd("small", "", "(" + x.ta + ") "));
+    if (x.p) { var a = nd("a", "", "📞"); a.href = "tel:" + x.p; lf.appendChild(a); }
+    t.appendChild(lf);
+    var dx = nd("span", "dx", "✕"); dx.onclick = function() { db.k = db.k.filter(function(y) { return y.id !== x.id; }); sv(); };
+    t.appendChild(dx); c.appendChild(t);
+    c.appendChild(nd("div", "", "Вход: " + (x.s1 || "-") + " (" + (x.t1 || "-") + ") | Выход: " + (x.s2 || "-") + " (" + (x.t2 || "-") + ")"));
+    var kb = nd("div", "kbtns"), b1 = nd("button", "bg", "Зашел"), b2 = nd("button", "", "Вышел"), b3 = nd("button", "br", "Нет");
+    b2.style.background = "#007aff";
+    b1.onclick = function() { mk(x.id, "in"); };
+    b2.onclick = function() { mk(x.id, "out"); };
+    b3.onclick = function() { mk(x.id, "abs"); };
+    kb.appendChild(b1); kb.appendChild(b2); kb.appendChild(b3);
+    c.appendChild(kb); tr.appendChild(c);
+  });
+
+  var rp = e("rep"); rp.innerHTML = "";
+  var rc = nd("div", "card");
+  rc.appendChild(nd("b", "", "Отчет " + gD() + " " + gT() + " | " + db.cr + " (" + db.cu + ")"));
+  fk.forEach(function(x, i) {
+    rc.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")));
+  });
+  rp.appendChild(rc);
+
+  var ar = e("arch"); ar.innerHTML = "";
+  db.a.forEach(function(item, idx) {
+    var ac = nd("div", "card");
+    var hd = nd("div", "row");
+    hd.appendChild(nd("b", "", item.dt + " " + item.tm + " | " + item.rt));
+    var dl = nd("span", "dx", "✕"); dl.onclick = function() { db.a.splice(idx, 1); sv(); };
+    hd.appendChild(dl); ac.appendChild(hd);
+    (item.k || []).forEach(function(x, i) {
+      ac.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")));
+    });
+    ar.appendChild(ac);
+  });
+}
+
+chk();
+</script>
 </body>
 </html>
