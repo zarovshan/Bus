@@ -44,7 +44,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:30px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 34 (Исправлены фото)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 35 (Школы и адреса)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <div id="tokBox"><input id="uT" type="password" placeholder="Токен GitHub (ghp_...)"></div>
@@ -63,12 +63,13 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <div class="card"><b>🚏 Остановки</b><input id="iS" placeholder="Название" style="margin-top:8px"><button type="button" id="aS" class="btn">+ Добавить</button><div id="lS"></div></div>
 <div class="card"><b>🔄 Рейсы</b><input id="iR" placeholder="Название" style="margin-top:8px"><button type="button" id="aR" class="btn">+ Добавить</button><div id="lR"></div></div>
 <div id="admBox" class="card" style="display:none"><b>👥 Пользователи (только для Админа)</b><input id="nL" placeholder="Логин" style="margin-top:8px"><input id="nP" placeholder="Пароль"><label style="font-size:12px;color:#666">Фото пользователя:</label><input type="file" id="nAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aU" class="btn bg">+ Добавить пользователя</button><div id="lU"></div></div>
+<div id="admSchBox" class="card" style="display:none"><b>🏫 Школы и адреса (только для Админа)</b><input id="nSch" placeholder="Название школы" style="margin-top:8px"><input id="nAddr" placeholder="Адрес школы"><button type="button" id="aSch" class="btn bg">+ Добавить школу</button><div id="lSch"></div></div>
 <div class="card copy"><b>ℹ️ О программе и авторе</b><br>© Все авторские права принадлежат:<br><b>Ахмадиеву Виктору Игоревичу</b><br>Телефон: <a href="tel:+79297890836">+79297890836</a><br>Почта: <a href="mailto:zarovshan@inbox.ru">zarovshan@inbox.ru</a><button type="button" class="btn btb" onclick="openDon()" style="margin-top:10px;margin-bottom:0">💛 Пожертвование на поддержку (Т-Банк)</button></div>
 </div>
 <div id="t5" class="pg"><div class="card"><b>👶 База учеников с фото</b><input id="iBK" placeholder="ФИО ученика" style="margin-top:8px"><input id="iBP" placeholder="Телефон"><label style="font-size:12px;color:#666">Фото ученика:</label><input type="file" id="iBAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aB" class="btn bg">+ Добавить в базу</button><div id="lB" style="margin-top:8px"></div></div></div>
 <div id="t2" class="pg act">
 <div class="clk" id="clk"></div>
-<div class="card">Рейс:<select id="rt"></select>Остановка:<select id="st"></select></div>
+<div class="card">Школа:<select id="schSel"></select>Рейс:<select id="rt"></select>Остановка:<select id="st"></select></div>
 <div class="card"><b>Добавить из базы в поездку:</b><input id="fBase" placeholder="🔍 Поиск по ФИО..." style="margin-top:8px;margin-bottom:6px;padding:8px;font-size:14px"><div id="pickB" class="bpick"></div></div>
 <div id="trip"></div>
 <button type="button" id="bCl" class="btn bo">Сбросить отметки</button>
@@ -109,13 +110,15 @@ var OLD_TAGS = ["bus_journal_db_main", "bus_journal_db_v30", "bus_journal_db_v29
 var gistId = localStorage.getItem(GIST_KEY) || "";
 var ADM = "zarovshan";
 var isSaving = false;
-var db = {u:[{l:"zarovshan",p:"VnIp159753",av:""}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
+var db = {u:[{l:"zarovshan",p:"VnIp159753",av:""}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],sc:[],csc:"",b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
 
 function mergeData(target, src) {
   if (!src || typeof src !== "object") return;
   if (Array.isArray(src.u) && src.u.length) target.u = src.u.map(function(u) { return Object.assign({ l: "", p: "", av: "" }, u); });
   if (Array.isArray(src.s)) target.s = src.s;
   if (Array.isArray(src.r)) target.r = src.r;
+  if (Array.isArray(src.sc)) target.sc = src.sc.map(function(item) { return Object.assign({ id: Date.now(), n: "", addr: "" }, item); });
+  if (src.csc !== undefined) target.csc = src.csc;
   if (Array.isArray(src.b)) target.b = src.b.map(function(b) { return Object.assign({ id: Date.now(), n: "", p: "", av: "" }, b); });
   if (Array.isArray(src.k)) target.k = src.k.map(function(k) { return Object.assign({ av: "" }, k); });
   if (Array.isArray(src.a)) target.a = src.a;
@@ -201,7 +204,6 @@ function resizeImg(file, cb) {
   rd.onerror = function() { cb(""); };
   rd.readAsDataURL(file);
 }
-
 function setSt(txt, ok) {
   if (!e("cloudSt")) return;
   e("cloudSt").textContent = txt;
@@ -256,6 +258,7 @@ function findOrCreateGist(cb) {
       cb(null);
     });
 }
+
 function pushCloud() {
   isSaving = true;
   setSt("☁️ Сохранение в GitHub...", true);
@@ -313,7 +316,6 @@ function sv() {
   if (db.cu) drw();
   pushCloud();
 }
-
 function updTokUI() {
   var has = !!GH_TOKEN;
   e("tokBox").style.display = has ? "none" : "block";
@@ -325,7 +327,9 @@ function chk() {
   e("auth").style.display = db.cu ? "none" : "block";
   e("app").style.display = db.cu ? "block" : "none";
   if (db.cu) {
-    e("admBox").style.display = db.cu === ADM ? "block" : "none";
+    var isAdm = db.cu === ADM;
+    e("admBox").style.display = isAdm ? "block" : "none";
+    e("admSchBox").style.display = isAdm ? "block" : "none";
     drw();
     pullCloud(function() { drw(); });
   } else {
@@ -412,10 +416,22 @@ e("updAv").onchange = function() {
   });
 };
 
+e("schSel").onchange = function() { db.csc = this.value; sv(); };
 e("rt").onchange = function() { db.cr = this.value; sv(); };
 e("st").onchange = function() { db.cs = this.value; sv(); };
 e("aS").onclick = function() { var v = e("iS").value.trim(); if (v) { db.s.push(v); db.cs = v; e("iS").value = ""; sv(); nf("Добавлено"); } };
 e("aR").onclick = function() { var v = e("iR").value.trim(); if (v) { db.r.push(v); db.cr = v; e("iR").value = ""; sv(); nf("Добавлено"); } };
+
+e("aSch").onclick = function() {
+  if (db.cu !== ADM) return;
+  var n = e("nSch").value.trim(), addr = e("nAddr").value.trim();
+  if (!n) return nf("Введите название школы");
+  var label = addr ? n + " (" + addr + ")" : n;
+  db.sc.push({ id: Date.now(), n: n, addr: addr });
+  db.csc = label;
+  e("nSch").value = ""; e("nAddr").value = "";
+  sv(); nf("Школа добавлена");
+};
 
 e("aU").onclick = function() {
   if (db.cu !== ADM) return;
@@ -487,7 +503,8 @@ function mk(id, a) {
 
 function buildRepText() {
   var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; });
-  var ln = ["Отчет " + gD() + " " + gT() + " | " + db.cr + " (" + db.cu + ")"];
+  var schTxt = db.csc ? "\nШкола: " + db.csc : "";
+  var ln = ["Отчет " + gD() + " " + gT() + " | " + db.cr + " (" + db.cu + ")" + schTxt];
   fk.forEach(function(x, i) {
     ln.push((i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")"));
   });
@@ -501,7 +518,7 @@ e("bCl").onclick = function() {
 e("bPr").onclick = function() { window.print(); };
 e("bAr").onclick = function() {
   var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; });
-  db.a.unshift({ dt: gD(), tm: gT(), rt: db.cr, by: db.cu, k: JSON.parse(JSON.stringify(fk)) });
+  db.a.unshift({ dt: gD(), tm: gT(), rt: db.cr, sc: db.csc || "", by: db.cu, k: JSON.parse(JSON.stringify(fk)) });
   sv(); nf("В Архиве");
 };
 e("bCp").onclick = function() { copyTxt(buildRepText(), "Отчет скопирован"); };
@@ -546,6 +563,7 @@ function drw() {
   db.r.forEach(function(v, i) { var s = nd("span", "tag", v), x = nd("span", "dx", "✕"); x.onclick = function() { db.r.splice(i, 1); sv(); }; s.appendChild(x); e("lR").appendChild(s); });
 
   e("lU").innerHTML = "";
+  e("lSch").innerHTML = "";
   if (db.cu === ADM) {
     db.u.forEach(function(u, i) {
       var r = nd("div", "row");
@@ -560,6 +578,18 @@ function drw() {
       if (u.l !== ADM) { var x = nd("span", "dx", "✕"); x.onclick = function() { db.u.splice(i, 1); sv(); }; rt.appendChild(x); }
       r.appendChild(rt);
       e("lU").appendChild(r);
+    });
+
+    db.sc.forEach(function(item, i) {
+      var r = nd("div", "row");
+      var info = nd("span", "");
+      info.appendChild(nd("b", "", item.n));
+      if (item.addr) info.appendChild(nd("div", "", "📍 " + item.addr));
+      r.appendChild(info);
+      var x = nd("span", "dx", "✕");
+      x.onclick = function() { db.sc.splice(i, 1); sv(); };
+      r.appendChild(x);
+      e("lSch").appendChild(r);
     });
   }
 
@@ -584,6 +614,21 @@ function drw() {
   });
 
   drwPick();
+
+  var scs = e("schSel"); scs.innerHTML = "";
+  if (!db.sc.length) {
+    scs.appendChild(nd("option", "", "Школы не добавлены админом"));
+    db.csc = "";
+  } else {
+    var labels = db.sc.map(function(item) { return item.addr ? item.n + " (" + item.addr + ")" : item.n; });
+    labels.forEach(function(lbl, i) {
+      var o = nd("option", "", lbl);
+      o.value = lbl;
+      scs.appendChild(o);
+      if (i === 0 && labels.indexOf(db.csc) === -1) db.csc = lbl;
+    });
+    scs.value = db.csc;
+  }
 
   var sr = e("rt"); sr.innerHTML = "";
   db.r.forEach(function(v, i) { sr.appendChild(nd("option", "", v)); if (i === 0 && db.r.indexOf(db.cr) === -1) db.cr = v; });
@@ -620,6 +665,7 @@ function drw() {
   var rp = e("rep"); rp.innerHTML = "";
   var rc = nd("div", "card");
   rc.appendChild(nd("b", "", "Отчет " + gD() + " " + gT() + " | " + db.cr + " (" + db.cu + ")"));
+  if (db.csc) rc.appendChild(nd("div", "", "🏫 Школа: " + db.csc));
   fk.forEach(function(x, i) {
     rc.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")));
   });
@@ -632,6 +678,7 @@ function drw() {
     hd.appendChild(nd("b", "", item.dt + " " + item.tm + " | " + item.rt));
     var dl = nd("span", "dx", "✕"); dl.onclick = function() { db.a.splice(idx, 1); sv(); };
     hd.appendChild(dl); ac.appendChild(hd);
+    if (item.sc) ac.appendChild(nd("div", "", "🏫 " + item.sc));
     (item.k || []).forEach(function(x, i) {
       ac.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")));
     });
