@@ -38,13 +38,16 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 .copy a{color:#007aff;text-decoration:none;font-weight:bold}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:1000}
 .mbox{background:#fff;border-radius:14px;padding:18px;max-width:360px;width:100%;text-align:center}
+.stlist{max-height:55vh;overflow-y:auto;margin:10px 0}
+.stopt{width:100%;padding:12px;border:1px solid #d1d1d6;border-radius:10px;background:#f9f9fb;font-size:16px;font-weight:bold;color:#1c1c1e;margin-bottom:8px;cursor:pointer}
+.stopt:active{background:#007aff;color:#fff;border-color:#007aff}
 @media print{.nav,.np,.top,.clk,.msg,.sync,.cam,.sbtn,.modal{display:none!important}body{background:#fff;padding:0}.card{box-shadow:none;border:1px solid #ccc}.pg{display:none!important}#t3{display:block!important}}
 </style>
 </head>
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:30px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 36 (Офлайн + Автосинхронизация)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 37 (Выбор остановки в окне)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <div id="tokBox"><input id="uT" type="password" placeholder="Токен GitHub (ghp_...)"></div>
@@ -64,12 +67,12 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <div class="card"><b>🔄 Рейсы</b><input id="iR" placeholder="Название" style="margin-top:8px"><button type="button" id="aR" class="btn">+ Добавить</button><div id="lR"></div></div>
 <div id="admBox" class="card" style="display:none"><b>👥 Пользователи (только для Админа)</b><input id="nL" placeholder="Логин" style="margin-top:8px"><input id="nP" placeholder="Пароль"><label style="font-size:12px;color:#666">Фото пользователя:</label><input type="file" id="nAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aU" class="btn bg">+ Добавить пользователя</button><div id="lU"></div></div>
 <div id="admSchBox" class="card" style="display:none"><b>🏫 Школы и адреса (только для Админа)</b><input id="nSch" placeholder="Название школы" style="margin-top:8px"><input id="nAddr" placeholder="Адрес школы"><button type="button" id="aSch" class="btn bg">+ Добавить школу</button><div id="lSch"></div></div>
-<div class="card copy"><b>ℹ️ О программе и авторе</b><br>© Все авторские права принадлежат:<br><b>Ахмадиеву Виктору Игоревичу</b><br>Телефон: <a href="tel:+79297890836">+79297890836</a><br>Почта: <a href="mailto:zarovshan@inbox.ru">zarovshan@inbox.ru</a><button type="button" class="btn btb" onclick="openDon()" style="margin-top:10px;margin-bottom:0">💛 Пожертвование на поддержку (Т-Банк)</button></div>
+<div class="card copy"><b>ℹ️ О программе и авторе</b><br>© Все авторские права принадлежат:<br><b>Ахмадиеву Виктору Игоревич</b><br>Телефон: <a href="tel:+79297890836">+79297890836</a><br>Почта: <a href="mailto:zarovshan@inbox.ru">zarovshan@inbox.ru</a><button type="button" class="btn btb" onclick="openDon()" style="margin-top:10px;margin-bottom:0">💛 Пожертвование на поддержку (Т-Банк)</button></div>
 </div>
 <div id="t5" class="pg"><div class="card"><b>👶 База учеников с фото</b><input id="iBK" placeholder="ФИО ученика" style="margin-top:8px"><input id="iBP" placeholder="Телефон"><label style="font-size:12px;color:#666">Фото ученика:</label><input type="file" id="iBAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aB" class="btn bg">+ Добавить в базу</button><div id="lB" style="margin-top:8px"></div></div></div>
 <div id="t2" class="pg act">
 <div class="clk" id="clk"></div>
-<div class="card">Школа:<select id="schSel"></select>Рейс:<select id="rt"></select>Остановка:<select id="st"></select></div>
+<div class="card">Школа:<select id="schSel"></select>Рейс:<select id="rt"></select></div>
 <div class="card"><b>Добавить из базы в поездку:</b><input id="fBase" placeholder="🔍 Поиск по ФИО..." style="margin-top:8px;margin-bottom:6px;padding:8px;font-size:14px"><div id="pickB" class="bpick"></div></div>
 <div id="trip"></div>
 <button type="button" id="bCl" class="btn bo">Сбросить отметки</button>
@@ -89,6 +92,14 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 </div></div>
 <div id="t4" class="pg"><div id="arch"></div></div>
 </div>
+<div id="stModal" class="modal" onclick="if(event.target===this)this.style.display='none'">
+<div class="mbox">
+<h3 id="stMTitle" style="margin-top:0;margin-bottom:4px">Выберите остановку</h3>
+<div id="stMKid" style="font-size:14px;color:#555;margin-bottom:8px"></div>
+<div id="stMList" class="stlist"></div>
+<button type="button" class="btn" style="background:#8e8e93;margin-bottom:0" onclick="e('stModal').style.display='none'">Отмена</button>
+</div>
+</div>
 <div id="donModal" class="modal" onclick="if(event.target===this)this.style.display='none'">
 <div class="mbox">
 <h3 style="margin-top:0">💛 Поддержка программы</h3>
@@ -105,7 +116,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 (function setupOfflineCache() {
   if (!("serviceWorker" in navigator)) return;
   var swCode = [
-    "var CACHE='bus-journal-v36';",
+    "var CACHE='bus-journal-v37';",
     "self.addEventListener('install',function(e){self.skipWaiting();});",
     "self.addEventListener('activate',function(e){e.waitUntil(clients.claim());});",
     "self.addEventListener('fetch',function(e){",
@@ -277,12 +288,12 @@ function findOrCreateGist(cb) {
             gistId = created.id;
             localStorage.setItem(GIST_KEY, gistId);
             cb(gistId);
-          }).catch(function(err) {
+          }).catch(function() {
             setSt("📴 Офлайн: нет сети для создания базы", "warn");
             cb(null);
           });
       }
-    }).catch(function(err) {
+    }).catch(function() {
       setSt("📴 Офлайн-режим (ожидает сеть)", "warn");
       cb(null);
     });
@@ -523,7 +534,6 @@ e("updAv").onchange = function() {
 
 e("schSel").onchange = function() { db.csc = this.value; sv(); };
 e("rt").onchange = function() { db.cr = this.value; sv(); };
-e("st").onchange = function() { db.cs = this.value; sv(); };
 e("aS").onclick = function() { var v = e("iS").value.trim(); if (v) { db.s.push(v); db.cs = v; e("iS").value = ""; sv(); nf("Добавлено"); } };
 e("aR").onclick = function() { var v = e("iR").value.trim(); if (v) { db.r.push(v); db.cr = v; e("iR").value = ""; sv(); nf("Добавлено"); } };
 
@@ -594,8 +604,29 @@ function drwPick() {
   });
 }
 
-function mk(id, a) {
-  var s = db.cs || e("st").value, t = gT();
+function openStopPick(kidObj, action) {
+  if (!db.s || !db.s.length) {
+    nf("Сначала добавьте остановки в Настройках");
+    return;
+  }
+  e("stMTitle").textContent = action === "in" ? "🚏 Остановка посадки (Зашел)" : "🚏 Остановка высадки (Вышел)";
+  e("stMKid").textContent = kidObj.n;
+  var box = e("stMList");
+  box.innerHTML = "";
+  db.s.forEach(function(stopName) {
+    var btn = nd("button", "stopt", stopName);
+    btn.type = "button";
+    btn.onclick = function() {
+      e("stModal").style.display = "none";
+      mk(kidObj.id, action, stopName);
+    };
+    box.appendChild(btn);
+  });
+  e("stModal").style.display = "flex";
+}
+
+function mk(id, a, stopName) {
+  var s = stopName || db.cs || "", t = gT();
   db.k.forEach(function(x) {
     if (x.id === id) {
       if (a === "in") { x.st = "in"; x.s1 = s; x.t1 = t; x.s2 = ""; x.t2 = ""; }
@@ -738,9 +769,6 @@ function drw() {
   var sr = e("rt"); sr.innerHTML = "";
   db.r.forEach(function(v, i) { sr.appendChild(nd("option", "", v)); if (i === 0 && db.r.indexOf(db.cr) === -1) db.cr = v; });
   sr.value = db.cr;
-  var ss = e("st"); ss.innerHTML = "";
-  db.s.forEach(function(v, i) { ss.appendChild(nd("option", "", v)); if (i === 0 && db.s.indexOf(db.cs) === -1) db.cs = v; });
-  ss.value = db.cs;
 
   var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; }), tr = e("trip"); tr.innerHTML = "";
   fk.forEach(function(x) {
@@ -760,8 +788,8 @@ function drw() {
     c.appendChild(nd("div", "", "Вход: " + (x.s1 || "-") + " (" + (x.t1 || "-") + ") | Выход: " + (x.s2 || "-") + " (" + (x.t2 || "-") + ")"));
     var kb = nd("div", "kbtns"), b1 = nd("button", "bg", "Зашел"), b2 = nd("button", "", "Вышел"), b3 = nd("button", "br", "Нет");
     b2.style.background = "#007aff";
-    b1.onclick = function() { mk(x.id, "in"); };
-    b2.onclick = function() { mk(x.id, "out"); };
+    b1.onclick = function() { openStopPick(x, "in"); };
+    b2.onclick = function() { openStopPick(x, "out"); };
     b3.onclick = function() { mk(x.id, "abs"); };
     kb.appendChild(b1); kb.appendChild(b2); kb.appendChild(b3);
     c.appendChild(kb); tr.appendChild(c);
