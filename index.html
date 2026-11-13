@@ -32,7 +32,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:40px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 24 (Яндекс Облако)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 25 (Бакет bus-sync)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <button type="button" id="bLn" class="btn">Войти</button>
@@ -61,8 +61,9 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <script>
 var API_URL = "https://yandexcloud.net";
 var ADM = "zarovshan";
+var isSaving = false;
 var db = {u:[{l:"zarovshan",p:"VnIp159753"}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
-try { var x = localStorage.getItem("b_v24"); if (x) Object.assign(db, JSON.parse(x)); } catch(e) {}
+try { var x = localStorage.getItem("b_v25"); if (x) Object.assign(db, JSON.parse(x)); } catch(e) {}
 
 function e(i) { return document.getElementById(i); }
 function nd(t, c, tx) { var d = document.createElement(t); if (c) d.className = c; if (tx !== undefined) d.textContent = tx; return d; }
@@ -79,6 +80,7 @@ function setSt(txt, ok) {
 }
 
 function pushCloud() {
+  isSaving = true;
   setSt("☁️ Сохранение в Яндекс...", true);
   var copy = JSON.parse(JSON.stringify(db));
   copy.cu = null;
@@ -87,15 +89,18 @@ function pushCloud() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(copy)
   }).then(function(r) {
+    isSaving = false;
     if (r.ok) setSt("☁️ Сохранено в Яндекс (" + gT() + ")", true);
-    else setSt("⚠️ Ошибка записи: HTTP " + r.status, false);
+    else setSt("⚠️ Ошибка записи: HTTP " + r.status + " (проверьте доступ в бакете)", false);
   }).catch(function(err) {
+    isSaving = false;
     setSt("⚠️ Ошибка отправки: " + err.message, false);
   });
 }
 
-function pullCloud(cb) {
-  setSt("☁️ Синхронизация с Яндекс...", true);
+function pullCloud(cb, silent) {
+  if (isSaving) { if (cb) cb(); return; }
+  if (!silent) setSt("☁️ Синхронизация с Яндекс...", true);
   fetch(API_URL + "?nocache=" + Date.now() + "_" + Math.random())
     .then(function(r) {
       if (r.status === 404) return null;
@@ -107,7 +112,7 @@ function pullCloud(cb) {
         var me = db.cu;
         Object.assign(db, data);
         db.cu = me;
-        try { localStorage.setItem("b_v24", JSON.stringify(db)); } catch(err) {}
+        try { localStorage.setItem("b_v25", JSON.stringify(db)); } catch(err) {}
         setSt("☁️ Синхронизировано (" + gT() + ")", true);
       } else {
         setSt("☁️ База в облаке пуста (готова к записи)", true);
@@ -120,7 +125,7 @@ function pullCloud(cb) {
 }
 
 function sv() {
-  try { localStorage.setItem("b_v24", JSON.stringify(db)); } catch(err) {}
+  try { localStorage.setItem("b_v25", JSON.stringify(db)); } catch(err) {}
   if (db.cu) drw();
   pushCloud();
 }
@@ -136,6 +141,18 @@ function chk() {
   }
 }
 
+setInterval(function() {
+  if (db.cu && !document.hidden) {
+    pullCloud(function() { drw(); }, true);
+  }
+}, 15000);
+
+document.addEventListener("visibilitychange", function() {
+  if (!document.hidden && db.cu) {
+    pullCloud(function() { drw(); }, true);
+  }
+});
+
 e("bLn").onclick = function() {
   var l = e("uL").value.trim(), p = e("uP").value.trim();
   e("bLn").textContent = "Загрузка базы...";
@@ -145,13 +162,13 @@ e("bLn").onclick = function() {
     db.u.forEach(function(u) { if (u.l === l && u.p === p) ok = 1; });
     if (ok) {
       db.cu = l;
-      try { localStorage.setItem("b_v24", JSON.stringify(db)); } catch(err) {}
+      try { localStorage.setItem("b_v25", JSON.stringify(db)); } catch(err) {}
       chk();
     } else nf("Неверный логин или пароль");
   });
 };
 
-e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem("b_v24", JSON.stringify(db)); } catch(err) {} chk(); };
+e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem("b_v25", JSON.stringify(db)); } catch(err) {} chk(); };
 e("bSync").onclick = function() { pullCloud(function() { drw(); nf("Обновлено"); }); };
 
 function tab(n) {
