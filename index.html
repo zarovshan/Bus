@@ -32,14 +32,14 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:40px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 25 (Бакет bus-sync)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 26 (Google Firebase)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <button type="button" id="bLn" class="btn">Войти</button>
 </div>
 <div id="app" style="display:none">
 <div class="top"><span>👤 <b id="cU"></b></span><div><button type="button" id="bSync" style="border:0;background:#34c759;color:#fff;padding:5px 8px;border-radius:6px;font-weight:bold;margin-right:4px">🔄 Обновить</button><button type="button" id="bOut" style="border:0;background:#e5e5ea;padding:5px 10px;border-radius:6px;font-weight:bold">Выйти</button></div></div>
-<div id="cloudSt" class="sync">☁️ Проверка связи с Яндекс...</div>
+<div id="cloudSt" class="sync">☁️ Проверка связи с облаком...</div>
 <div class="nav"><button type="button" id="b1">Настройка</button><button type="button" id="b5">База</button><button type="button" id="b2" class="act">Поездка</button><button type="button" id="b3">Отчет</button><button type="button" id="b4">Архив</button></div>
 <div id="t1" class="pg">
 <div class="card"><b>🚏 Остановки</b><input id="iS" placeholder="Название" style="margin-top:8px"><button type="button" id="aS" class="btn">+ Добавить</button><div id="lS"></div></div>
@@ -59,11 +59,11 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 </div>
 <div id="tst" class="msg"></div>
 <script>
-var API_URL = "https://yandexcloud.net";
+var API_URL = "https://firebaseio.com";
 var ADM = "zarovshan";
 var isSaving = false;
 var db = {u:[{l:"zarovshan",p:"VnIp159753"}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
-try { var x = localStorage.getItem("b_v25"); if (x) Object.assign(db, JSON.parse(x)); } catch(e) {}
+try { var x = localStorage.getItem("b_v26"); if (x) Object.assign(db, JSON.parse(x)); } catch(e) {}
 
 function e(i) { return document.getElementById(i); }
 function nd(t, c, tx) { var d = document.createElement(t); if (c) d.className = c; if (tx !== undefined) d.textContent = tx; return d; }
@@ -81,7 +81,7 @@ function setSt(txt, ok) {
 
 function pushCloud() {
   isSaving = true;
-  setSt("☁️ Сохранение в Яндекс...", true);
+  setSt("☁️ Сохранение в облако...", true);
   var copy = JSON.parse(JSON.stringify(db));
   copy.cu = null;
   fetch(API_URL, {
@@ -90,8 +90,8 @@ function pushCloud() {
     body: JSON.stringify(copy)
   }).then(function(r) {
     isSaving = false;
-    if (r.ok) setSt("☁️ Сохранено в Яндекс (" + gT() + ")", true);
-    else setSt("⚠️ Ошибка записи: HTTP " + r.status + " (проверьте доступ в бакете)", false);
+    if (r.ok) setSt("☁️ Сохранено в облаке (" + gT() + ")", true);
+    else setSt("⚠️ Ошибка записи: HTTP " + r.status, false);
   }).catch(function(err) {
     isSaving = false;
     setSt("⚠️ Ошибка отправки: " + err.message, false);
@@ -100,32 +100,38 @@ function pushCloud() {
 
 function pullCloud(cb, silent) {
   if (isSaving) { if (cb) cb(); return; }
-  if (!silent) setSt("☁️ Синхронизация с Яндекс...", true);
-  fetch(API_URL + "?nocache=" + Date.now() + "_" + Math.random())
+  if (!silent) setSt("☁️ Синхронизация...", true);
+  fetch(API_URL + "?nocache=" + Date.now())
     .then(function(r) {
-      if (r.status === 404) return null;
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
     })
     .then(function(data) {
       if (data && data.u) {
         var me = db.cu;
-        Object.assign(db, data);
+        db.s = data.s || [];
+        db.r = data.r || [];
+        db.b = data.b || [];
+        db.k = data.k || [];
+        db.a = data.a || [];
+        db.u = data.u || db.u;
+        if (data.cr) db.cr = data.cr;
+        if (data.cs) db.cs = data.cs;
         db.cu = me;
-        try { localStorage.setItem("b_v25", JSON.stringify(db)); } catch(err) {}
+        try { localStorage.setItem("b_v26", JSON.stringify(db)); } catch(err) {}
         setSt("☁️ Синхронизировано (" + gT() + ")", true);
       } else {
         setSt("☁️ База в облаке пуста (готова к записи)", true);
       }
       if (cb) cb();
     }).catch(function(err) {
-      setSt("⚠️ Нет связи с Яндекс: " + err.message, false);
+      setSt("⚠️ Нет связи: " + err.message, false);
       if (cb) cb();
     });
 }
 
 function sv() {
-  try { localStorage.setItem("b_v25", JSON.stringify(db)); } catch(err) {}
+  try { localStorage.setItem("b_v26", JSON.stringify(db)); } catch(err) {}
   if (db.cu) drw();
   pushCloud();
 }
@@ -145,7 +151,7 @@ setInterval(function() {
   if (db.cu && !document.hidden) {
     pullCloud(function() { drw(); }, true);
   }
-}, 15000);
+}, 10000);
 
 document.addEventListener("visibilitychange", function() {
   if (!document.hidden && db.cu) {
@@ -162,13 +168,13 @@ e("bLn").onclick = function() {
     db.u.forEach(function(u) { if (u.l === l && u.p === p) ok = 1; });
     if (ok) {
       db.cu = l;
-      try { localStorage.setItem("b_v25", JSON.stringify(db)); } catch(err) {}
+      try { localStorage.setItem("b_v26", JSON.stringify(db)); } catch(err) {}
       chk();
     } else nf("Неверный логин или пароль");
   });
 };
 
-e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem("b_v25", JSON.stringify(db)); } catch(err) {} chk(); };
+e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem("b_v26", JSON.stringify(db)); } catch(err) {} chk(); };
 e("bSync").onclick = function() { pullCloud(function() { drw(); nf("Обновлено"); }); };
 
 function tab(n) {
