@@ -22,22 +22,24 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 .kbtns{display:flex;gap:6px;margin-top:8px}.kbtns button{flex:1;padding:10px;border:0;border-radius:8px;color:#fff;font-weight:bold}
 .clk{background:#007aff15;color:#007aff;padding:8px;border-radius:8px;font-weight:bold;text-align:center;margin-bottom:10px}
 .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px;color:#555}
-.row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #eee}
-.dx{color:#ff3b30;font-weight:bold;padding:2px 6px;cursor:pointer}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee}
+.dx{color:#ff3b30;font-weight:bold;padding:4px 8px;cursor:pointer}
 .msg{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;display:none;z-index:999}
 .sync{font-size:12px;text-align:center;margin-bottom:8px;color:#34c759;font-weight:bold}
-.av{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#e5e5ea;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;color:#555;font-size:14px;flex-shrink:0;border:1px solid #d1d1d6}
-.av-sm{width:28px;height:28px;font-size:12px}
-.uinfo{display:inline-flex;align-items:center;gap:8px}
-.cam{cursor:pointer;padding:2px 6px;font-size:15px}
+.av{width:40px;height:40px;border-radius:50%;object-fit:cover;background:#e5e5ea;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;color:#555;font-size:16px;flex-shrink:0;border:1px solid #d1d1d6}
+.av-sm{width:32px;height:32px;font-size:13px}
+.uinfo{display:inline-flex;align-items:center;gap:10px}
+.cam{cursor:pointer;padding:4px 8px;font-size:16px;background:#f2f2f7;border-radius:6px;margin-right:4px}
 .lnk{text-align:center;font-size:12px;color:#007aff;margin-top:6px;cursor:pointer}
-@media print{.nav,.np,.top,.clk,.msg,.sync,.cam{display:none!important}body{background:#fff;padding:0}.card{box-shadow:none;border:1px solid #ccc}.pg{display:none!important}#t3{display:block!important}}
+.bpick{max-height:220px;overflow-y:auto;border:1px solid #eee;border-radius:8px;padding:0 8px}
+.sbtn{border:0;background:#34c759;color:#fff;padding:6px 10px;border-radius:6px;font-weight:bold;font-size:13px;cursor:pointer}
+@media print{.nav,.np,.top,.clk,.msg,.sync,.cam,.sbtn{display:none!important}body{background:#fff;padding:0}.card{box-shadow:none;border:1px solid #ccc}.pg{display:none!important}#t3{display:block!important}}
 </style>
 </head>
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:40px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 30 (Аватарки + GitHub)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 32 (Единая база + Аватарки)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <div id="tokBox"><input id="uT" type="password" placeholder="Токен GitHub (ghp_...)"></div>
@@ -52,13 +54,13 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <div class="card"><b>👤 Моя аватарка</b><div style="display:flex;align-items:center;gap:10px;margin-top:8px"><span id="myAv"></span><input type="file" id="iMyAv" accept="image/*" style="margin:0;padding:7px;font-size:13px"></div></div>
 <div class="card"><b>🚏 Остановки</b><input id="iS" placeholder="Название" style="margin-top:8px"><button type="button" id="aS" class="btn">+ Добавить</button><div id="lS"></div></div>
 <div class="card"><b>🔄 Рейсы</b><input id="iR" placeholder="Название" style="margin-top:8px"><button type="button" id="aR" class="btn">+ Добавить</button><div id="lR"></div></div>
-<div id="admBox" class="card" style="display:none"><b>👥 Пользователи (только для Админа)</b><input id="nL" placeholder="Логин" style="margin-top:8px"><input id="nP" placeholder="Пароль"><input type="file" id="nAv" accept="image/*" style="padding:7px;font-size:13px"><button type="button" id="aU" class="btn bg">+ Добавить пользователя</button><div id="lU"></div></div>
+<div id="admBox" class="card" style="display:none"><b>👥 Пользователи (только для Админа)</b><input id="nL" placeholder="Логин" style="margin-top:8px"><input id="nP" placeholder="Пароль"><label style="font-size:12px;color:#666">Фото пользователя:</label><input type="file" id="nAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aU" class="btn bg">+ Добавить пользователя</button><div id="lU"></div></div>
 </div>
-<div id="t5" class="pg"><div class="card"><b>👶 База учеников</b><input id="iBK" placeholder="ФИО" style="margin-top:8px"><input id="iBP" placeholder="Телефон"><input type="file" id="iBAv" accept="image/*" style="padding:7px;font-size:13px"><button type="button" id="aB" class="btn bg">+ В базу</button><div id="lB"></div></div></div>
+<div id="t5" class="pg"><div class="card"><b>👶 База учеников с фото</b><input id="iBK" placeholder="ФИО ученика" style="margin-top:8px"><input id="iBP" placeholder="Телефон"><label style="font-size:12px;color:#666">Фото ученика:</label><input type="file" id="iBAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aB" class="btn bg">+ Добавить в базу</button><div id="lB" style="margin-top:8px"></div></div></div>
 <div id="t2" class="pg act">
 <div class="clk" id="clk"></div>
 <div class="card">Рейс:<select id="rt"></select>Остановка:<select id="st"></select></div>
-<div class="card"><b>Выбрать из базы:</b><select id="selB" style="margin-top:6px"></select><button type="button" id="aFB" class="btn bg">+ В поездку</button></div>
+<div class="card"><b>Добавить из базы в поездку:</b><input id="fBase" placeholder="🔍 Поиск по ФИО..." style="margin-top:8px;margin-bottom:6px;padding:8px;font-size:14px"><div id="pickB" class="bpick"></div></div>
 <div id="trip"></div>
 <button type="button" id="bCl" class="btn bo">Сбросить отметки</button>
 </div>
@@ -69,12 +71,42 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <div id="tst" class="msg"></div>
 <script>
 var GH_TOKEN = localStorage.getItem("gh_tok") || "";
-var GIST_TAG = "bus_journal_db_v30";
-var gistId = localStorage.getItem("gh_gist_id_v30") || "";
+var DB_KEY = "bus_journal_main";
+var GIST_KEY = "gh_gist_main";
+var GIST_TAG = "bus_journal_db_main";
+var OLD_TAGS = ["bus_journal_db_main", "bus_journal_db_v30", "bus_journal_db_v29", "bus_journal_db_v28", "bus_journal_db_v27"];
+var gistId = localStorage.getItem(GIST_KEY) || "";
 var ADM = "zarovshan";
 var isSaving = false;
 var db = {u:[{l:"zarovshan",p:"VnIp159753",av:""}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
-try { var x = localStorage.getItem("b_v30"); if (x) Object.assign(db, JSON.parse(x)); } catch(e) {}
+
+function mergeData(target, src) {
+  if (!src || typeof src !== "object") return;
+  if (Array.isArray(src.u) && src.u.length) target.u = src.u.map(function(u) { return Object.assign({ l: "", p: "", av: "" }, u); });
+  if (Array.isArray(src.s)) target.s = src.s;
+  if (Array.isArray(src.r)) target.r = src.r;
+  if (Array.isArray(src.b)) target.b = src.b.map(function(b) { return Object.assign({ id: Date.now(), n: "", p: "", av: "" }, b); });
+  if (Array.isArray(src.k)) target.k = src.k.map(function(k) { return Object.assign({ av: "" }, k); });
+  if (Array.isArray(src.a)) target.a = src.a;
+  if (src.cr) target.cr = src.cr;
+  if (src.cs) target.cs = src.cs;
+}
+
+(function loadLocal() {
+  var keys = [DB_KEY, "b_v31", "b_v30", "b_v29", "b_v28", "b_v27"];
+  for (var i = 0; i < keys.length; i++) {
+    try {
+      var raw = localStorage.getItem(keys[i]);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        mergeData(db, parsed);
+        if (parsed.cu) db.cu = parsed.cu;
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
+        break;
+      }
+    } catch (e) {}
+  }
+})();
 
 var P1 = "https", P2 = "api", P3 = "github", P4 = "com", P5 = "gists";
 var BASE_URL = P1 + "://" + P2 + "." + P3 + "." + P4 + "/" + P5;
@@ -104,15 +136,17 @@ function resizeImg(file, cb) {
     var img = new Image();
     img.onload = function() {
       var c = document.createElement("canvas");
-      c.width = 90; c.height = 90;
+      c.width = 96; c.height = 96;
       var ctx = c.getContext("2d");
       var m = Math.min(img.width, img.height);
       var sx = (img.width - m) / 2, sy = (img.height - m) / 2;
-      ctx.drawImage(img, sx, sy, m, m, 0, 0, 90, 90);
+      ctx.drawImage(img, sx, sy, m, m, 0, 0, 96, 96);
       cb(c.toDataURL("image/jpeg", 0.72));
     };
+    img.onerror = function() { cb(""); };
     img.src = ev.target.result;
   };
+  rd.onerror = function() { cb(""); };
   rd.readAsDataURL(file);
 }
 
@@ -132,13 +166,17 @@ function ghHeaders() {
 
 function findOrCreateGist(cb) {
   if (gistId) { cb(gistId); return; }
-  fetch(BASE_URL + "?per_page=50&t=" + Date.now(), { headers: ghHeaders() })
+  fetch(BASE_URL + "?per_page=100&t=" + Date.now(), { headers: ghHeaders() })
     .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
     .then(function(list) {
-      var found = list.find(function(g) { return g.description === GIST_TAG && g.files && g.files["db.json"]; });
+      var found = null;
+      for (var i = 0; i < OLD_TAGS.length; i++) {
+        found = list.find(function(g) { return g.description === OLD_TAGS[i] && g.files && g.files["db.json"]; });
+        if (found) break;
+      }
       if (found) {
         gistId = found.id;
-        localStorage.setItem("gh_gist_id_v30", gistId);
+        localStorage.setItem(GIST_KEY, gistId);
         cb(gistId);
       } else {
         var copy = JSON.parse(JSON.stringify(db));
@@ -154,7 +192,7 @@ function findOrCreateGist(cb) {
         }).then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
           .then(function(created) {
             gistId = created.id;
-            localStorage.setItem("gh_gist_id_v30", gistId);
+            localStorage.setItem(GIST_KEY, gistId);
             cb(gistId);
           }).catch(function(err) {
             setSt("⚠️ Ошибка создания базы: " + err.message, false);
@@ -176,7 +214,10 @@ function pushCloud() {
     fetch(BASE_URL + "/" + id, {
       method: "PATCH",
       headers: ghHeaders(),
-      body: JSON.stringify({ files: { "db.json": { content: JSON.stringify(copy) } } })
+      body: JSON.stringify({
+        description: GIST_TAG,
+        files: { "db.json": { content: JSON.stringify(copy) } }
+      })
     }).then(function(r) {
       isSaving = false;
       if (r.ok) setSt("☁️ Сохранено в облаке (" + gT() + ")", true);
@@ -201,16 +242,9 @@ function pullCloud(cb, silent) {
           var data = JSON.parse(raw);
           if (data && data.u) {
             var me = db.cu;
-            db.s = data.s || [];
-            db.r = data.r || [];
-            db.b = data.b || [];
-            db.k = data.k || [];
-            db.a = data.a || [];
-            db.u = data.u || db.u;
-            if (data.cr) db.cr = data.cr;
-            if (data.cs) db.cs = data.cs;
+            mergeData(db, data);
             db.cu = me;
-            try { localStorage.setItem("b_v30", JSON.stringify(db)); } catch(err) {}
+            try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(err) {}
             setSt("☁️ Синхронизировано (" + gT() + ")", true);
           }
         }
@@ -223,7 +257,7 @@ function pullCloud(cb, silent) {
 }
 
 function sv() {
-  try { localStorage.setItem("b_v30", JSON.stringify(db)); } catch(err) {}
+  try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(err) {}
   if (db.cu) drw();
   pushCloud();
 }
@@ -274,7 +308,7 @@ e("bLn").onclick = function() {
       localStorage.setItem("gh_tok", GH_TOKEN);
       updTokUI();
       db.cu = l;
-      try { localStorage.setItem("b_v30", JSON.stringify(db)); } catch(err) {}
+      try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(err) {}
       chk();
     } else {
       if (t) { GH_TOKEN = ""; updTokUI(); }
@@ -283,7 +317,7 @@ e("bLn").onclick = function() {
   });
 };
 
-e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem("b_v30", JSON.stringify(db)); } catch(err) {} chk(); };
+e("bOut").onclick = function() { db.cu = null; try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(err) {} chk(); };
 e("bSync").onclick = function() { pullCloud(function() { drw(); nf("Обновлено"); }); };
 
 function tab(n) {
@@ -300,7 +334,7 @@ e("b4").onclick = function() { tab(4); };
 e("b5").onclick = function() { tab(5); };
 
 e("iMyAv").onchange = function() {
-  var f = this.files && this.files;
+  var f = this.files && this.files[0];
   if (!f) return;
   resizeImg(f, function(b64) {
     db.u.forEach(function(u) { if (u.l === db.cu) u.av = b64; });
@@ -311,7 +345,7 @@ e("iMyAv").onchange = function() {
 
 var editAvTarget = null;
 e("updAv").onchange = function() {
-  var f = this.files && this.files;
+  var f = this.files && this.files[0];
   if (!f || !editAvTarget) return;
   resizeImg(f, function(b64) {
     if (editAvTarget.type === "u" && db.u[editAvTarget.idx]) db.u[editAvTarget.idx].av = b64;
@@ -338,7 +372,7 @@ e("aU").onclick = function() {
   var ex = 0;
   db.u.forEach(function(u) { if (u.l === l) ex = 1; });
   if (ex) return nf("Логин занят");
-  var f = e("nAv").files && e("nAv").files;
+  var f = e("nAv").files && e("nAv").files[0];
   resizeImg(f, function(b64) {
     db.u.push({ l: l, p: p, av: b64 });
     e("nL").value = ""; e("nP").value = ""; e("nAv").value = "";
@@ -348,25 +382,45 @@ e("aU").onclick = function() {
 
 e("aB").onclick = function() {
   var v = e("iBK").value.trim(), p = e("iBP").value.trim();
-  if (!v) return;
-  var f = e("iBAv").files && e("iBAv").files;
+  if (!v) return nf("Введите ФИО ученика");
+  var f = e("iBAv").files && e("iBAv").files[0];
   resizeImg(f, function(b64) {
     db.b.push({ id: Date.now(), n: v, p: p, av: b64 });
     e("iBK").value = ""; e("iBP").value = ""; e("iBAv").value = "";
-    sv(); nf("В базе");
+    sv(); nf("Ученик добавлен в базу");
   });
 };
 
-e("aFB").onclick = function() {
-  var i = e("selB").value;
-  if (i !== "") {
-    var u = db.b[Number(i)];
-    if (u) {
-      db.k.push({ id: Date.now(), n: u.n, p: u.p, av: u.av || "", rt: db.cr, ta: gT(), st: "none", s1: "", t1: "", s2: "", t2: "", by: db.cu });
-      sv(); nf("В поездке");
-    }
+e("fBase").oninput = function() { drwPick(); };
+function addFromBase(u) {
+  db.k.push({ id: Date.now(), n: u.n, p: u.p, av: u.av || "", rt: db.cr, ta: gT(), st: "none", s1: "", t1: "", s2: "", t2: "", by: db.cu });
+  sv(); nf("Добавлен в поездку");
+}
+
+function drwPick() {
+  var pb = e("pickB");
+  if (!pb) return;
+  pb.innerHTML = "";
+  var q = (e("fBase") ? e("fBase").value : "").trim().toLowerCase();
+  var list = db.b.filter(function(u) { return !q || u.n.toLowerCase().indexOf(q) !== -1; });
+  if (!list.length) {
+    pb.appendChild(nd("div", "row", "В базе пока пусто"));
+    return;
   }
-};
+  list.forEach(function(u) {
+    var r = nd("div", "row");
+    var lf = nd("span", "uinfo");
+    lf.appendChild(mkAv(u.av, u.n, true));
+    lf.appendChild(nd("span", "", u.n));
+    r.appendChild(lf);
+    var btn = nd("button", "sbtn", "+ В поездку");
+    btn.type = "button";
+    btn.onclick = function() { addFromBase(u); };
+    r.appendChild(btn);
+    pb.appendChild(r);
+  });
+}
+
 function mk(id, a) {
   var s = db.cs || e("st").value, t = gT();
   db.k.forEach(function(x) {
@@ -433,8 +487,11 @@ function drw() {
   db.b.forEach(function(u, i) {
     var r = nd("div", "row");
     var lf = nd("span", "uinfo");
-    lf.appendChild(mkAv(u.av, u.n, true));
-    lf.appendChild(nd("span", "", (i + 1) + ". " + u.n + " " + u.p));
+    lf.appendChild(mkAv(u.av, u.n, false));
+    var info = nd("span", "");
+    info.appendChild(nd("b", "", (i + 1) + ". " + u.n));
+    if (u.p) info.appendChild(nd("div", "", "📞 " + u.p));
+    lf.appendChild(info);
     r.appendChild(lf);
     var rt = nd("span", "");
     var cm = nd("span", "cam", "📷");
@@ -446,8 +503,8 @@ function drw() {
     e("lB").appendChild(r);
   });
 
-  var sb = e("selB"); sb.innerHTML = "";
-  db.b.forEach(function(u, i) { var o = nd("option", "", u.n); o.value = i; sb.appendChild(o); });
+  drwPick();
+
   var sr = e("rt"); sr.innerHTML = "";
   db.r.forEach(function(v, i) { sr.appendChild(nd("option", "", v)); if (i === 0 && db.r.indexOf(db.cr) === -1) db.cr = v; });
   sr.value = db.cr;
