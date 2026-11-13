@@ -39,15 +39,18 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:1000}
 .mbox{background:#fff;border-radius:14px;padding:18px;max-width:360px;width:100%;text-align:center}
 .stlist{max-height:55vh;overflow-y:auto;margin:10px 0}
-.stopt{width:100%;padding:12px;border:1px solid #d1d1d6;border-radius:10px;background:#f9f9fb;font-size:16px;font-weight:bold;color:#1c1c1e;margin-bottom:8px;cursor:pointer}
+.stopt{width:100%;padding:12px;border:1px solid #d1d1d6;border-radius:10px;background:#f9f9fb;font-size:16px;font-weight:bold;color:#1c1c1e;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
 .stopt:active{background:#007aff;color:#fff;border-color:#007aff}
+.tbadge{background:#007aff18;color:#007aff;padding:3px 8px;border-radius:6px;font-size:13px;font-weight:bold}
+.inprow{display:flex;gap:8px;margin-top:8px}
+.inprow input[type="time"]{width:125px;flex-shrink:0}
 @media print{.nav,.np,.top,.clk,.msg,.sync,.cam,.sbtn,.modal{display:none!important}body{background:#fff;padding:0}.card{box-shadow:none;border:1px solid #ccc}.pg{display:none!important}#t3{display:block!important}}
 </style>
 </head>
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:30px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 37 (Выбор остановки в окне)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 39 (Расписание по рейсам)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <div id="tokBox"><input id="uT" type="password" placeholder="Токен GitHub (ghp_...)"></div>
@@ -63,16 +66,16 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <div class="nav"><button type="button" id="b1">Настройка</button><button type="button" id="b5">База</button><button type="button" id="b2" class="act">Поездка</button><button type="button" id="b3">Отчет</button><button type="button" id="b4">Архив</button></div>
 <div id="t1" class="pg">
 <div class="card"><b>👤 Моя аватарка</b><div style="display:flex;align-items:center;gap:10px;margin-top:8px"><span id="myAv"></span><input type="file" id="iMyAv" accept="image/*" style="margin:0;padding:7px;font-size:13px"></div></div>
-<div class="card"><b>🚏 Остановки</b><input id="iS" placeholder="Название" style="margin-top:8px"><button type="button" id="aS" class="btn">+ Добавить</button><div id="lS"></div></div>
-<div class="card"><b>🔄 Рейсы</b><input id="iR" placeholder="Название" style="margin-top:8px"><button type="button" id="aR" class="btn">+ Добавить</button><div id="lR"></div></div>
+<div class="card"><b>🔄 Рейсы и время выезда</b><div class="inprow"><input id="iR" placeholder="Рейс (напр. Рейс №1)"><input id="iRT" type="time" title="Время выезда"></div><button type="button" id="aR" class="btn">+ Добавить рейс</button><div id="lR"></div></div>
+<div class="card"><b>🚏 Остановки и время для рейса:</b><select id="sRtSel" style="margin-top:6px"></select><div class="inprow"><input id="iS" placeholder="Остановка (напр. Школа)"><input id="iST" type="time" title="Время остановки"></div><button type="button" id="aS" class="btn">+ Добавить остановку</button><div id="lS"></div></div>
 <div id="admBox" class="card" style="display:none"><b>👥 Пользователи (только для Админа)</b><input id="nL" placeholder="Логин" style="margin-top:8px"><input id="nP" placeholder="Пароль"><label style="font-size:12px;color:#666">Фото пользователя:</label><input type="file" id="nAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aU" class="btn bg">+ Добавить пользователя</button><div id="lU"></div></div>
 <div id="admSchBox" class="card" style="display:none"><b>🏫 Школы и адреса (только для Админа)</b><input id="nSch" placeholder="Название школы" style="margin-top:8px"><input id="nAddr" placeholder="Адрес школы"><button type="button" id="aSch" class="btn bg">+ Добавить школу</button><div id="lSch"></div></div>
-<div class="card copy"><b>ℹ️ О программе и авторе</b><br>© Все авторские права принадлежат:<br><b>Ахмадиеву Виктору Игоревич</b><br>Телефон: <a href="tel:+79297890836">+79297890836</a><br>Почта: <a href="mailto:zarovshan@inbox.ru">zarovshan@inbox.ru</a><button type="button" class="btn btb" onclick="openDon()" style="margin-top:10px;margin-bottom:0">💛 Пожертвование на поддержку (Т-Банк)</button></div>
+<div class="card copy"><b>ℹ️ О программе и авторе</b><br>© Все авторские права принадлежат:<br><b>Ахмадиеву Виктору Игоревичу</b><br>Телефон: <a href="tel:+79297890836">+79297890836</a><br>Почта: <a href="mailto:zarovshan@inbox.ru">zarovshan@inbox.ru</a><button type="button" class="btn btb" onclick="openDon()" style="margin-top:10px;margin-bottom:0">💛 Пожертвование на поддержку (Т-Банк)</button></div>
 </div>
 <div id="t5" class="pg"><div class="card"><b>👶 База учеников с фото</b><input id="iBK" placeholder="ФИО ученика" style="margin-top:8px"><input id="iBP" placeholder="Телефон"><label style="font-size:12px;color:#666">Фото ученика:</label><input type="file" id="iBAv" accept="image/*" style="padding:7px;font-size:13px;margin-top:4px"><button type="button" id="aB" class="btn bg">+ Добавить в базу</button><div id="lB" style="margin-top:8px"></div></div></div>
 <div id="t2" class="pg act">
 <div class="clk" id="clk"></div>
-<div class="card">Школа:<select id="schSel"></select>Рейс:<select id="rt"></select></div>
+<div class="card">Школа:<select id="schSel"></select>Рейс:<select id="rt"></select><div id="rtInfo" style="font-size:13px;color:#007aff;font-weight:bold;margin-top:-4px"></div></div>
 <div class="card"><b>Добавить из базы в поездку:</b><input id="fBase" placeholder="🔍 Поиск по ФИО..." style="margin-top:8px;margin-bottom:6px;padding:8px;font-size:14px"><div id="pickB" class="bpick"></div></div>
 <div id="trip"></div>
 <button type="button" id="bCl" class="btn bo">Сбросить отметки</button>
@@ -100,6 +103,16 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <button type="button" class="btn" style="background:#8e8e93;margin-bottom:0" onclick="e('stModal').style.display='none'">Отмена</button>
 </div>
 </div>
+<div id="tmModal" class="modal" onclick="if(event.target===this)this.style.display='none'">
+<div class="mbox">
+<h3 id="tmMTitle" style="margin-top:0;margin-bottom:6px">Время по графику</h3>
+<div id="tmMName" style="font-size:14px;color:#555;margin-bottom:10px"></div>
+<input id="tmMInp" type="time" style="font-size:18px;text-align:center">
+<button type="button" id="tmMSave" class="btn bg">Сохранить время</button>
+<button type="button" id="tmMClear" class="btn bo">Очистить время</button>
+<button type="button" class="btn" style="background:#8e8e93;margin-bottom:0" onclick="e('tmModal').style.display='none'">Отмена</button>
+</div>
+</div>
 <div id="donModal" class="modal" onclick="if(event.target===this)this.style.display='none'">
 <div class="mbox">
 <h3 style="margin-top:0">💛 Поддержка программы</h3>
@@ -116,7 +129,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 (function setupOfflineCache() {
   if (!("serviceWorker" in navigator)) return;
   var swCode = [
-    "var CACHE='bus-journal-v37';",
+    "var CACHE='bus-journal-v39';",
     "self.addEventListener('install',function(e){self.skipWaiting();});",
     "self.addEventListener('activate',function(e){e.waitUntil(clients.claim());});",
     "self.addEventListener('fetch',function(e){",
@@ -142,13 +155,16 @@ var gistId = localStorage.getItem(GIST_KEY) || "";
 var ADM = "zarovshan";
 var isSaving = false;
 var hasPendingSync = localStorage.getItem(DIRTY_KEY) === "1";
-var db = {u:[{l:"zarovshan",p:"VnIp159753",av:""}],cu:null,s:["Остановка 1","Школа"],r:["Утро","Вечер"],sc:[],csc:"",b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
+var db = {u:[{l:"zarovshan",p:"VnIp159753",av:""}],cu:null,s:["Остановка 1","Школа"],st:{},rst:{},r:["Утро","Вечер"],rt:{},sc:[],csc:"",b:[],k:[],a:[],cr:"Утро",cs:"Остановка 1"};
 
 function mergeData(target, src) {
   if (!src || typeof src !== "object") return;
   if (Array.isArray(src.u) && src.u.length) target.u = src.u.map(function(u) { return Object.assign({ l: "", p: "", av: "" }, u); });
   if (Array.isArray(src.s)) target.s = src.s;
+  if (src.st && typeof src.st === "object") target.st = src.st;
+  if (src.rst && typeof src.rst === "object") target.rst = src.rst;
   if (Array.isArray(src.r)) target.r = src.r;
+  if (src.rt && typeof src.rt === "object") target.rt = src.rt;
   if (Array.isArray(src.sc)) target.sc = src.sc.map(function(item) { return Object.assign({ id: Date.now(), n: "", addr: "" }, item); });
   if (src.csc !== undefined) target.csc = src.csc;
   if (Array.isArray(src.b)) target.b = src.b.map(function(b) { return Object.assign({ id: Date.now(), n: "", p: "", av: "" }, b); });
@@ -173,7 +189,6 @@ function mergeData(target, src) {
     } catch (e) {}
   }
 })();
-
 var P1 = "https", P2 = "api", P3 = "github", P4 = "com", P5 = "gists";
 var BASE_URL = P1 + "://" + P2 + "." + P3 + "." + P4 + "/" + P5;
 
@@ -185,12 +200,26 @@ function gD() { var n = new Date(); return p2(n.getDate()) + "." + p2(n.getMonth
 function gT() { var n = new Date(); return p2(n.getHours()) + ":" + p2(n.getMinutes()); }
 setInterval(function() { if (e("clk")) e("clk").textContent = "📅 " + gD() + "  🕒 " + gT(); }, 1000);
 
+function getStopTime(routeName, stopName) {
+  if (db.rst && db.rst[routeName] && db.rst[routeName][stopName]) return db.rst[routeName][stopName];
+  if (db.st && db.st[stopName]) return db.st[stopName];
+  return "";
+}
+
+function setStopTime(routeName, stopName, val) {
+  if (!db.rst) db.rst = {};
+  if (!db.rst[routeName]) db.rst[routeName] = {};
+  if (val) db.rst[routeName][stopName] = val;
+  else {
+    delete db.rst[routeName][stopName];
+    if (db.st && db.st[stopName]) delete db.st[stopName];
+  }
+}
+
 function copyTxt(str, msg) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(str).then(function() { nf(msg || "Скопировано"); }).catch(function() { fallbackCopy(str, msg); });
-  } else {
-    fallbackCopy(str, msg);
-  }
+  } else fallbackCopy(str, msg);
 }
 
 function fallbackCopy(str, msg) {
@@ -278,88 +307,41 @@ function findOrCreateGist(cb) {
         fetch(BASE_URL, {
           method: "POST",
           headers: ghHeaders(),
-          body: JSON.stringify({
-            description: GIST_TAG,
-            public: false,
-            files: { "db.json": { content: JSON.stringify(copy) } }
-          })
+          body: JSON.stringify({ description: GIST_TAG, public: false, files: { "db.json": { content: JSON.stringify(copy) } } })
         }).then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-          .then(function(created) {
-            gistId = created.id;
-            localStorage.setItem(GIST_KEY, gistId);
-            cb(gistId);
-          }).catch(function() {
-            setSt("📴 Офлайн: нет сети для создания базы", "warn");
-            cb(null);
-          });
+          .then(function(created) { gistId = created.id; localStorage.setItem(GIST_KEY, gistId); cb(gistId); })
+          .catch(function() { setSt("📴 Офлайн: нет сети для создания базы", "warn"); cb(null); });
       }
-    }).catch(function() {
-      setSt("📴 Офлайн-режим (ожидает сеть)", "warn");
-      cb(null);
-    });
+    }).catch(function() { setSt("📴 Офлайн-режим (ожидает сеть)", "warn"); cb(null); });
 }
 
 function pushCloud(cb) {
   if (!GH_TOKEN) { if (cb) cb(false); return; }
   if (navigator.onLine === false) {
-    markDirty(true);
-    setSt("📴 Нет интернета — сохранено локально (отправится при появлении сети)", "warn");
-    if (cb) cb(false);
-    return;
+    markDirty(true); setSt("📴 Нет интернета — сохранено локально", "warn");
+    if (cb) cb(false); return;
   }
   if (isSaving) { if (cb) cb(false); return; }
-  isSaving = true;
-  setSt("☁️ Отправка данных в облако...", "ok");
+  isSaving = true; setSt("☁️ Отправка данных в облако...", "ok");
   findOrCreateGist(function(id) {
-    if (!id) {
-      isSaving = false;
-      markDirty(true);
-      setSt("📴 Нет связи — данные в очереди на отправку", "warn");
-      if (cb) cb(false);
-      return;
-    }
+    if (!id) { isSaving = false; markDirty(true); setSt("📴 Нет связи — данные в очереди", "warn"); if (cb) cb(false); return; }
     var copy = JSON.parse(JSON.stringify(db));
     copy.cu = null;
     fetch(BASE_URL + "/" + id, {
       method: "PATCH",
       headers: ghHeaders(),
-      body: JSON.stringify({
-        description: GIST_TAG,
-        files: { "db.json": { content: JSON.stringify(copy) } }
-      })
+      body: JSON.stringify({ description: GIST_TAG, files: { "db.json": { content: JSON.stringify(copy) } } })
     }).then(function(r) {
       isSaving = false;
-      if (r.ok) {
-        markDirty(false);
-        setSt("☁️ Синхронизировано с облаком (" + gT() + ")", "ok");
-        if (cb) cb(true);
-      } else {
-        markDirty(true);
-        setSt("⚠️ Ошибка сервера: HTTP " + r.status + " (повторим позже)", "err");
-        if (cb) cb(false);
-      }
-    }).catch(function() {
-      isSaving = false;
-      markDirty(true);
-      setSt("📴 Нет интернета — сохранено в телефоне (отправится при сети)", "warn");
-      if (cb) cb(false);
-    });
+      if (r.ok) { markDirty(false); setSt("☁️ Синхронизировано (" + gT() + ")", "ok"); if (cb) cb(true); }
+      else { markDirty(true); setSt("⚠️ Ошибка сервера: HTTP " + r.status, "err"); if (cb) cb(false); }
+    }).catch(function() { isSaving = false; markDirty(true); setSt("📴 Нет интернета — сохранено локально", "warn"); if (cb) cb(false); });
   });
 }
 
 function pullCloud(cb, silent) {
-  if (hasPendingSync) {
-    pushCloud(function(ok) {
-      if (ok && cb) cb();
-      else if (cb) cb();
-    });
-    return;
-  }
-  if (navigator.onLine === false) {
-    setSt("📴 Офлайн-режим (работа с локальной базой)", "warn");
-    if (cb) cb();
-    return;
-  }
+  if (hasPendingSync) { pushCloud(function() { if (cb) cb(); }); return; }
+  if (navigator.onLine === false) { setSt("📴 Офлайн-режим", "warn"); if (cb) cb(); return; }
   if (isSaving) { if (cb) cb(); return; }
   if (!silent) setSt("☁️ Синхронизация...", "ok");
   findOrCreateGist(function(id) {
@@ -372,18 +354,13 @@ function pullCloud(cb, silent) {
         if (raw) {
           var data = JSON.parse(raw);
           if (data && data.u) {
-            var me = db.cu;
-            mergeData(db, data);
-            db.cu = me;
+            var me = db.cu; mergeData(db, data); db.cu = me;
             try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(err) {}
             setSt("☁️ Синхронизировано (" + gT() + ")", "ok");
           }
         }
         if (cb) cb();
-      }).catch(function() {
-        setSt("📴 Нет интернета — работаем автономно", "warn");
-        if (cb) cb();
-      });
+      }).catch(function() { setSt("📴 Нет интернета — работаем автономно", "warn"); if (cb) cb(); });
   });
 }
 
@@ -410,9 +387,7 @@ function chk() {
     drw();
     if (hasPendingSync) pushCloud(function() { drw(); });
     else pullCloud(function() { drw(); });
-  } else {
-    updTokUI();
-  }
+  } else updTokUI();
 }
 
 window.addEventListener("online", function() {
@@ -429,11 +404,8 @@ window.addEventListener("offline", function() {
 
 setInterval(function() {
   if (!db.cu) return;
-  if (hasPendingSync) {
-    if (navigator.onLine !== false) pushCloud(function() { drw(); });
-  } else if (!document.hidden) {
-    pullCloud(function() { drw(); }, true);
-  }
+  if (hasPendingSync) { if (navigator.onLine !== false) pushCloud(function() { drw(); }); }
+  else if (!document.hidden) pullCloud(function() { drw(); }, true);
 }, 8000);
 
 document.addEventListener("visibilitychange", function() {
@@ -443,11 +415,7 @@ document.addEventListener("visibilitychange", function() {
   }
 });
 
-e("rstTok").onclick = function() {
-  GH_TOKEN = "";
-  localStorage.removeItem("gh_tok");
-  updTokUI();
-};
+e("rstTok").onclick = function() { GH_TOKEN = ""; localStorage.removeItem("gh_tok"); updTokUI(); };
 
 function finishLogin(l) {
   localStorage.setItem("gh_tok", GH_TOKEN);
@@ -461,28 +429,18 @@ e("bLn").onclick = function() {
   var l = e("uL").value.trim(), p = e("uP").value.trim(), t = e("uT").value.trim();
   if (!GH_TOKEN && !t) return nf("Введите токен GitHub (ghp_...)");
   if (t) GH_TOKEN = t;
-
   var localOk = db.u.some(function(u) { return u.l === l && u.p === p; });
   if (navigator.onLine === false) {
-    if (localOk) {
-      finishLogin(l);
-      nf("Вход выполнен без интернета");
-    } else {
-      nf("Нет интернета. Неверный логин или пароль");
-    }
+    if (localOk) { finishLogin(l); nf("Вход выполнен без интернета"); }
+    else nf("Нет интернета. Неверный логин или пароль");
     return;
   }
-
   e("bLn").textContent = "Проверка...";
   pullCloud(function() {
     e("bLn").textContent = "Войти";
     var ok = db.u.some(function(u) { return u.l === l && u.p === p; });
-    if (ok) {
-      finishLogin(l);
-    } else {
-      if (t) { GH_TOKEN = ""; updTokUI(); }
-      nf("Неверный логин, пароль или токен");
-    }
+    if (ok) finishLogin(l);
+    else { if (t) { GH_TOKEN = ""; updTokUI(); } nf("Неверный логин, пароль или токен"); }
   });
 };
 
@@ -504,14 +462,12 @@ e("b2").onclick = function() { tab(2); };
 e("b3").onclick = function() { tab(3); };
 e("b4").onclick = function() { tab(4); };
 e("b5").onclick = function() { tab(5); };
-
 e("iMyAv").onchange = function() {
   var f = getFirstFile(this);
   if (!f) return;
   resizeImg(f, function(b64) {
     db.u.forEach(function(u) { if (u.l === db.cu) u.av = b64; });
-    e("iMyAv").value = "";
-    sv(); nf("Аватарка обновлена");
+    e("iMyAv").value = ""; sv(); nf("Аватарка обновлена");
   });
 };
 
@@ -526,51 +482,86 @@ e("updAv").onchange = function() {
       var kName = db.b[editAvTarget.idx].n;
       db.k.forEach(function(k) { if (k.n === kName) k.av = b64; });
     }
-    e("updAv").value = "";
-    editAvTarget = null;
-    sv(); nf("Фото сохранено");
+    e("updAv").value = ""; editAvTarget = null; sv(); nf("Фото сохранено");
   });
 };
 
+var editTimeTarget = null;
+function openTimeEdit(type, name) {
+  var selR = e("sRtSel") ? e("sRtSel").value : db.cr;
+  editTimeTarget = { type: type, name: name, route: selR };
+  e("tmMTitle").textContent = type === "r" ? "🕒 Время выезда рейса" : "🕒 Время остановки (" + selR + ")";
+  e("tmMName").textContent = name;
+  var cur = type === "r" ? (db.rt && db.rt[name]) : getStopTime(selR, name);
+  e("tmMInp").value = cur || "";
+  e("tmModal").style.display = "flex";
+}
+
+e("tmMSave").onclick = function() {
+  if (!editTimeTarget) return;
+  var val = e("tmMInp").value;
+  if (editTimeTarget.type === "r") {
+    if (!db.rt) db.rt = {};
+    if (val) db.rt[editTimeTarget.name] = val;
+    else delete db.rt[editTimeTarget.name];
+  } else setStopTime(editTimeTarget.route, editTimeTarget.name, val);
+  e("tmModal").style.display = "none"; editTimeTarget = null; sv(); nf("Время сохранено");
+};
+
+e("tmMClear").onclick = function() {
+  if (!editTimeTarget) return;
+  if (editTimeTarget.type === "r" && db.rt) delete db.rt[editTimeTarget.name];
+  if (editTimeTarget.type === "s") setStopTime(editTimeTarget.route, editTimeTarget.name, "");
+  e("tmModal").style.display = "none"; editTimeTarget = null; sv(); nf("Время убрано");
+};
+
+e("sRtSel").onchange = function() { db.cr = this.value; sv(); };
 e("schSel").onchange = function() { db.csc = this.value; sv(); };
 e("rt").onchange = function() { db.cr = this.value; sv(); };
-e("aS").onclick = function() { var v = e("iS").value.trim(); if (v) { db.s.push(v); db.cs = v; e("iS").value = ""; sv(); nf("Добавлено"); } };
-e("aR").onclick = function() { var v = e("iR").value.trim(); if (v) { db.r.push(v); db.cr = v; e("iR").value = ""; sv(); nf("Добавлено"); } };
+
+e("aS").onclick = function() {
+  var v = e("iS").value.trim(), tm = e("iST").value, selR = e("sRtSel").value || db.cr;
+  if (!v) return;
+  if (db.s.indexOf(v) === -1) db.s.push(v);
+  if (tm) setStopTime(selR, v, tm);
+  db.cs = v; e("iS").value = ""; e("iST").value = ""; sv(); nf("Остановка добавлена");
+};
+
+e("aR").onclick = function() {
+  var v = e("iR").value.trim(), tm = e("iRT").value;
+  if (!v) return;
+  if (db.r.indexOf(v) === -1) db.r.push(v);
+  if (!db.rt) db.rt = {};
+  if (tm) db.rt[v] = tm;
+  db.cr = v; e("iR").value = ""; e("iRT").value = ""; sv(); nf("Рейс добавлен");
+};
 
 e("aSch").onclick = function() {
   if (db.cu !== ADM) return;
   var n = e("nSch").value.trim(), addr = e("nAddr").value.trim();
   if (!n) return nf("Введите название школы");
-  var label = addr ? n + " (" + addr + ")" : n;
   db.sc.push({ id: Date.now(), n: n, addr: addr });
-  db.csc = label;
-  e("nSch").value = ""; e("nAddr").value = "";
-  sv(); nf("Школа добавлена");
+  db.csc = addr ? n + " (" + addr + ")" : n;
+  e("nSch").value = ""; e("nAddr").value = ""; sv(); nf("Школа добавлена");
 };
 
 e("aU").onclick = function() {
   if (db.cu !== ADM) return;
   var l = e("nL").value.trim(), p = e("nP").value.trim();
   if (!l || !p) return nf("Введите данные");
-  var ex = 0;
-  db.u.forEach(function(u) { if (u.l === l) ex = 1; });
-  if (ex) return nf("Логин занят");
-  var f = getFirstFile(e("nAv"));
-  resizeImg(f, function(b64) {
+  if (db.u.some(function(u) { return u.l === l; })) return nf("Логин занят");
+  resizeImg(getFirstFile(e("nAv")), function(b64) {
     db.u.push({ l: l, p: p, av: b64 });
-    e("nL").value = ""; e("nP").value = ""; e("nAv").value = "";
-    sv(); nf("Пользователь добавлен");
+    e("nL").value = ""; e("nP").value = ""; e("nAv").value = ""; sv(); nf("Пользователь добавлен");
   });
 };
 
 e("aB").onclick = function() {
   var v = e("iBK").value.trim(), p = e("iBP").value.trim();
   if (!v) return nf("Введите ФИО ученика");
-  var f = getFirstFile(e("iBAv"));
-  resizeImg(f, function(b64) {
+  resizeImg(getFirstFile(e("iBAv")), function(b64) {
     db.b.push({ id: Date.now(), n: v, p: p, av: b64 });
-    e("iBK").value = ""; e("iBP").value = ""; e("iBAv").value = "";
-    sv(); nf("Ученик добавлен в базу");
+    e("iBK").value = ""; e("iBP").value = ""; e("iBAv").value = ""; sv(); nf("Ученик добавлен в базу");
   });
 };
 
@@ -586,40 +577,30 @@ function drwPick() {
   pb.innerHTML = "";
   var q = (e("fBase") ? e("fBase").value : "").trim().toLowerCase();
   var list = db.b.filter(function(u) { return !q || u.n.toLowerCase().indexOf(q) !== -1; });
-  if (!list.length) {
-    pb.appendChild(nd("div", "row", "В базе пока пусто"));
-    return;
-  }
+  if (!list.length) { pb.appendChild(nd("div", "row", "В базе пока пусто")); return; }
   list.forEach(function(u) {
-    var r = nd("div", "row");
-    var lf = nd("span", "uinfo");
+    var r = nd("div", "row"), lf = nd("span", "uinfo");
     lf.appendChild(mkAv(u.av, u.n, true));
     lf.appendChild(nd("span", "", u.n));
     r.appendChild(lf);
     var btn = nd("button", "sbtn", "+ В поездку");
-    btn.type = "button";
-    btn.onclick = function() { addFromBase(u); };
-    r.appendChild(btn);
-    pb.appendChild(r);
+    btn.type = "button"; btn.onclick = function() { addFromBase(u); };
+    r.appendChild(btn); pb.appendChild(r);
   });
 }
 
 function openStopPick(kidObj, action) {
-  if (!db.s || !db.s.length) {
-    nf("Сначала добавьте остановки в Настройках");
-    return;
-  }
-  e("stMTitle").textContent = action === "in" ? "🚏 Остановка посадки (Зашел)" : "🚏 Остановка высадки (Вышел)";
+  if (!db.s || !db.s.length) return nf("Сначала добавьте остановки в Настройках");
+  e("stMTitle").textContent = action === "in" ? "🚏 Посадка (" + db.cr + ")" : "🚏 Высадка (" + db.cr + ")";
   e("stMKid").textContent = kidObj.n;
-  var box = e("stMList");
-  box.innerHTML = "";
+  var box = e("stMList"); box.innerHTML = "";
   db.s.forEach(function(stopName) {
-    var btn = nd("button", "stopt", stopName);
-    btn.type = "button";
-    btn.onclick = function() {
-      e("stModal").style.display = "none";
-      mk(kidObj.id, action, stopName);
-    };
+    var btn = document.createElement("button");
+    btn.type = "button"; btn.className = "stopt";
+    btn.appendChild(nd("span", "", stopName));
+    var planTm = getStopTime(db.cr, stopName);
+    if (planTm) btn.appendChild(nd("span", "tbadge", "🕒 " + planTm));
+    btn.onclick = function() { e("stModal").style.display = "none"; mk(kidObj.id, action, stopName); };
     box.appendChild(btn);
   });
   e("stModal").style.display = "flex";
@@ -637,10 +618,15 @@ function mk(id, a, stopName) {
   sv();
 }
 
+function getRouteLabel(rName) {
+  var tm = db.rt && db.rt[rName];
+  return tm ? rName + " (выезд " + tm + ")" : rName;
+}
+
 function buildRepText() {
   var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; });
   var schTxt = db.csc ? "\nШкола: " + db.csc : "";
-  var ln = ["Отчет " + gD() + " " + gT() + " | " + db.cr + " (" + db.cu + ")" + schTxt];
+  var ln = ["Отчет " + gD() + " " + gT() + " | " + getRouteLabel(db.cr) + " (" + db.cu + ")" + schTxt];
   fk.forEach(function(x, i) {
     ln.push((i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")"));
   });
@@ -654,135 +640,128 @@ e("bCl").onclick = function() {
 e("bPr").onclick = function() { window.print(); };
 e("bAr").onclick = function() {
   var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; });
-  db.a.unshift({ dt: gD(), tm: gT(), rt: db.cr, sc: db.csc || "", by: db.cu, k: JSON.parse(JSON.stringify(fk)) });
+  db.a.unshift({ dt: gD(), tm: gT(), rt: getRouteLabel(db.cr), sc: db.csc || "", by: db.cu, k: JSON.parse(JSON.stringify(fk)) });
   sv(); nf("В Архиве");
 };
 e("bCp").onclick = function() { copyTxt(buildRepText(), "Отчет скопирован"); };
-
 e("bSh").onclick = function() {
   var txt = buildRepText();
-  if (navigator.share) {
-    navigator.share({ title: "Отчет журнала автобуса", text: txt }).catch(function() {});
-  } else {
-    copyTxt(txt, "Текст скопирован (меню Поделиться не поддерживается в этом браузере)");
-  }
+  if (navigator.share) navigator.share({ title: "Отчет журнала автобуса", text: txt }).catch(function() {});
+  else copyTxt(txt, "Текст скопирован");
 };
-
-e("bTg").onclick = function() {
-  var txt = encodeURIComponent(buildRepText());
-  window.open("https://t.me" + txt, "_blank");
-};
-
-e("bWa").onclick = function() {
-  var txt = encodeURIComponent(buildRepText());
-  window.open("https://whatsapp.com" + txt, "_blank");
-};
-
-e("bEm").onclick = function() {
-  var subj = encodeURIComponent("Отчет журнала автобуса " + gD() + " (" + db.cr + ")");
-  var body = encodeURIComponent(buildRepText());
-  window.location.href = "mailto:?subject=" + subj + "&body=" + body;
-};
-
+e("bTg").onclick = function() { window.open("https://t.me" + encodeURIComponent(buildRepText()), "_blank"); };
+e("bWa").onclick = function() { window.open("https://whatsapp.com" + encodeURIComponent(buildRepText()), "_blank"); };
+e("bEm").onclick = function() { window.location.href = "mailto:?subject=" + encodeURIComponent("Отчет " + gD()) + "&body=" + encodeURIComponent(buildRepText()); };
 function drw() {
   var meObj = db.u.find(function(u) { return u.l === db.cu; }) || { l: db.cu, av: "" };
   var cub = e("cUBox"); cub.innerHTML = "";
   cub.appendChild(mkAv(meObj.av, db.cu, true));
   cub.appendChild(nd("b", "", db.cu + (db.cu === ADM ? " (Админ)" : "")));
-
   var mav = e("myAv"); mav.innerHTML = "";
   mav.appendChild(mkAv(meObj.av, db.cu, false));
 
-  e("lS").innerHTML = "";
-  db.s.forEach(function(v, i) { var s = nd("span", "tag", v), x = nd("span", "dx", "✕"); x.onclick = function() { db.s.splice(i, 1); sv(); }; s.appendChild(x); e("lS").appendChild(s); });
-  e("lR").innerHTML = "";
-  db.r.forEach(function(v, i) { var s = nd("span", "tag", v), x = nd("span", "dx", "✕"); x.onclick = function() { db.r.splice(i, 1); sv(); }; s.appendChild(x); e("lR").appendChild(s); });
+  var srs = e("sRtSel"); srs.innerHTML = "";
+  db.r.forEach(function(v, i) {
+    var o = nd("option", "", getRouteLabel(v));
+    o.value = v; srs.appendChild(o);
+    if (i === 0 && db.r.indexOf(db.cr) === -1) db.cr = v;
+  });
+  srs.value = db.cr;
 
-  e("lU").innerHTML = "";
-  e("lSch").innerHTML = "";
+  e("lR").innerHTML = "";
+  db.r.forEach(function(v, i) {
+    var r = nd("div", "row"), lf = nd("span", "uinfo");
+    lf.appendChild(nd("b", "", v));
+    var tm = db.rt && db.rt[v];
+    if (tm) lf.appendChild(nd("span", "tbadge", "выезд " + tm));
+    r.appendChild(lf);
+    var rt = nd("span", ""), cm = nd("span", "cam", "🕒");
+    cm.onclick = function() { openTimeEdit("r", v); };
+    rt.appendChild(cm);
+    var x = nd("span", "dx", "✕");
+    x.onclick = function() { db.r.splice(i, 1); if (db.rt) delete db.rt[v]; if (db.rst) delete db.rst[v]; sv(); };
+    rt.appendChild(x); r.appendChild(rt); e("lR").appendChild(r);
+  });
+
+  e("lS").innerHTML = "";
+  db.s.forEach(function(v, i) {
+    var r = nd("div", "row"), lf = nd("span", "uinfo");
+    lf.appendChild(nd("span", "", v));
+    var tm = getStopTime(db.cr, v);
+    if (tm) lf.appendChild(nd("span", "tbadge", tm));
+    r.appendChild(lf);
+    var rt = nd("span", ""), cm = nd("span", "cam", "🕒");
+    cm.onclick = function() { openTimeEdit("s", v); };
+    rt.appendChild(cm);
+    var x = nd("span", "dx", "✕");
+    x.onclick = function() { db.s.splice(i, 1); sv(); };
+    rt.appendChild(x); r.appendChild(rt); e("lS").appendChild(r);
+  });
+
+  e("lU").innerHTML = ""; e("lSch").innerHTML = "";
   if (db.cu === ADM) {
     db.u.forEach(function(u, i) {
-      var r = nd("div", "row");
-      var lf = nd("span", "uinfo");
-      lf.appendChild(mkAv(u.av, u.l, true));
-      lf.appendChild(nd("span", "", u.l + " (" + u.p + ")"));
+      var r = nd("div", "row"), lf = nd("span", "uinfo");
+      lf.appendChild(mkAv(u.av, u.l, true)); lf.appendChild(nd("span", "", u.l + " (" + u.p + ")"));
       r.appendChild(lf);
-      var rt = nd("span", "");
-      var cm = nd("span", "cam", "📷");
+      var rt = nd("span", ""), cm = nd("span", "cam", "📷");
       cm.onclick = function() { editAvTarget = { type: "u", idx: i }; e("updAv").click(); };
       rt.appendChild(cm);
       if (u.l !== ADM) { var x = nd("span", "dx", "✕"); x.onclick = function() { db.u.splice(i, 1); sv(); }; rt.appendChild(x); }
-      r.appendChild(rt);
-      e("lU").appendChild(r);
+      r.appendChild(rt); e("lU").appendChild(r);
     });
-
     db.sc.forEach(function(item, i) {
-      var r = nd("div", "row");
-      var info = nd("span", "");
+      var r = nd("div", "row"), info = nd("span", "");
       info.appendChild(nd("b", "", item.n));
       if (item.addr) info.appendChild(nd("div", "", "📍 " + item.addr));
       r.appendChild(info);
-      var x = nd("span", "dx", "✕");
-      x.onclick = function() { db.sc.splice(i, 1); sv(); };
-      r.appendChild(x);
-      e("lSch").appendChild(r);
+      var x = nd("span", "dx", "✕"); x.onclick = function() { db.sc.splice(i, 1); sv(); };
+      r.appendChild(x); e("lSch").appendChild(r);
     });
   }
 
   e("lB").innerHTML = "";
   db.b.forEach(function(u, i) {
-    var r = nd("div", "row");
-    var lf = nd("span", "uinfo");
+    var r = nd("div", "row"), lf = nd("span", "uinfo");
     lf.appendChild(mkAv(u.av, u.n, false));
-    var info = nd("span", "");
-    info.appendChild(nd("b", "", (i + 1) + ". " + u.n));
+    var info = nd("span", ""); info.appendChild(nd("b", "", (i + 1) + ". " + u.n));
     if (u.p) info.appendChild(nd("div", "", "📞 " + u.p));
-    lf.appendChild(info);
-    r.appendChild(lf);
-    var rt = nd("span", "");
-    var cm = nd("span", "cam", "📷");
+    lf.appendChild(info); r.appendChild(lf);
+    var rt = nd("span", ""), cm = nd("span", "cam", "📷");
     cm.onclick = function() { editAvTarget = { type: "b", idx: i }; e("updAv").click(); };
     rt.appendChild(cm);
     var x = nd("span", "dx", "✕"); x.onclick = function() { db.b.splice(i, 1); sv(); };
-    rt.appendChild(x);
-    r.appendChild(rt);
-    e("lB").appendChild(r);
+    rt.appendChild(x); r.appendChild(rt); e("lB").appendChild(r);
   });
 
   drwPick();
 
   var scs = e("schSel"); scs.innerHTML = "";
-  if (!db.sc.length) {
-    scs.appendChild(nd("option", "", "Школы не добавлены админом"));
-    db.csc = "";
-  } else {
+  if (!db.sc.length) { scs.appendChild(nd("option", "", "Школы не добавлены админом")); db.csc = ""; }
+  else {
     var labels = db.sc.map(function(item) { return item.addr ? item.n + " (" + item.addr + ")" : item.n; });
     labels.forEach(function(lbl, i) {
-      var o = nd("option", "", lbl);
-      o.value = lbl;
-      scs.appendChild(o);
+      var o = nd("option", "", lbl); o.value = lbl; scs.appendChild(o);
       if (i === 0 && labels.indexOf(db.csc) === -1) db.csc = lbl;
     });
     scs.value = db.csc;
   }
 
   var sr = e("rt"); sr.innerHTML = "";
-  db.r.forEach(function(v, i) { sr.appendChild(nd("option", "", v)); if (i === 0 && db.r.indexOf(db.cr) === -1) db.cr = v; });
+  db.r.forEach(function(v, i) { var o = nd("option", "", getRouteLabel(v)); o.value = v; sr.appendChild(o); });
   sr.value = db.cr;
+  var rTm = db.rt && db.rt[db.cr];
+  e("rtInfo").textContent = rTm ? "🕒 Время выезда по графику: " + rTm : "";
 
   var fk = db.k.filter(function(x) { return !x.rt || x.rt === db.cr; }), tr = e("trip"); tr.innerHTML = "";
   fk.forEach(function(x) {
     var bMatch = db.b.find(function(b) { return b.n === x.n; });
-    var avSrc = x.av || (bMatch ? bMatch.av : "");
     var c = nd("div", "kid " + x.st), t = nd("div", "row"); t.style.border = 0;
-    var lf = nd("span", "uinfo");
-    lf.appendChild(mkAv(avSrc, x.n, false));
-    var tx = nd("span", "");
-    tx.appendChild(nd("b", "", x.n + " "));
+    var lf = nd("span", "uinfo"); lf.appendChild(mkAv(x.av || (bMatch ? bMatch.av : ""), x.n, false));
+    var tx = nd("span", ""); tx.appendChild(nd("b", "", x.n + " "));
     if (x.ta) tx.appendChild(nd("small", "", "(" + x.ta + ") "));
     if (x.p) { var a = nd("a", "", "📞"); a.href = "tel:" + x.p; tx.appendChild(a); }
-    lf.appendChild(tx);
-    t.appendChild(lf);
+    lf.appendChild(tx); t.appendChild(lf);
     var dx = nd("span", "dx", "✕"); dx.onclick = function() { db.k = db.k.filter(function(y) { return y.id !== x.id; }); sv(); };
     t.appendChild(dx); c.appendChild(t);
     c.appendChild(nd("div", "", "Вход: " + (x.s1 || "-") + " (" + (x.t1 || "-") + ") | Выход: " + (x.s2 || "-") + " (" + (x.t2 || "-") + ")"));
@@ -791,30 +770,23 @@ function drw() {
     b1.onclick = function() { openStopPick(x, "in"); };
     b2.onclick = function() { openStopPick(x, "out"); };
     b3.onclick = function() { mk(x.id, "abs"); };
-    kb.appendChild(b1); kb.appendChild(b2); kb.appendChild(b3);
-    c.appendChild(kb); tr.appendChild(c);
+    kb.appendChild(b1); kb.appendChild(b2); kb.appendChild(b3); c.appendChild(kb); tr.appendChild(c);
   });
 
-  var rp = e("rep"); rp.innerHTML = "";
-  var rc = nd("div", "card");
-  rc.appendChild(nd("b", "", "Отчет " + gD() + " " + gT() + " | " + db.cr + " (" + db.cu + ")"));
+  var rp = e("rep"); rp.innerHTML = ""; var rc = nd("div", "card");
+  rc.appendChild(nd("b", "", "Отчет " + gD() + " " + gT() + " | " + getRouteLabel(db.cr) + " (" + db.cu + ")"));
   if (db.csc) rc.appendChild(nd("div", "", "🏫 Школа: " + db.csc));
-  fk.forEach(function(x, i) {
-    rc.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")));
-  });
+  fk.forEach(function(x, i) { rc.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")"))); });
   rp.appendChild(rc);
 
   var ar = e("arch"); ar.innerHTML = "";
   db.a.forEach(function(item, idx) {
-    var ac = nd("div", "card");
-    var hd = nd("div", "row");
+    var ac = nd("div", "card"), hd = nd("div", "row");
     hd.appendChild(nd("b", "", item.dt + " " + item.tm + " | " + item.rt));
     var dl = nd("span", "dx", "✕"); dl.onclick = function() { db.a.splice(idx, 1); sv(); };
     hd.appendChild(dl); ac.appendChild(hd);
     if (item.sc) ac.appendChild(nd("div", "", "🏫 " + item.sc));
-    (item.k || []).forEach(function(x, i) {
-      ac.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")")));
-    });
+    (item.k || []).forEach(function(x, i) { ac.appendChild(nd("div", "", (i + 1) + ". " + x.n + ": " + (x.st === "abs" ? "Нет" : x.s1 + "(" + x.t1 + ")-" + (x.s2 || "путь") + "(" + x.t2 + ")"))); });
     ar.appendChild(ac);
   });
 }
