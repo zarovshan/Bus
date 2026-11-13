@@ -44,7 +44,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid #ccc;border-radiu
 <body>
 <div id="auth" class="card" style="max-width:400px;margin:30px auto">
 <h2 style="margin-top:0;text-align:center">🚌 Вход в журнал</h2>
-<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 33 (Единая база + Отправка)</div>
+<div id="vs" style="text-align:center;font-size:13px;font-weight:bold;color:#34c759;margin-bottom:10px">Версия 34 (Исправлены фото)</div>
 <input id="uL" placeholder="Логин">
 <input id="uP" type="password" placeholder="Пароль">
 <div id="tokBox"><input id="uT" type="password" placeholder="Токен GitHub (ghp_...)"></div>
@@ -174,6 +174,11 @@ function mkAv(src, name, sm) {
     return img;
   }
   return nd("span", sm ? "av av-sm" : "av", (name || "?").charAt(0).toUpperCase());
+}
+
+function getFirstFile(inputEl) {
+  if (!inputEl || !inputEl.files || !inputEl.files.length) return null;
+  return inputEl.files.item(0);
 }
 
 function resizeImg(file, cb) {
@@ -381,7 +386,7 @@ e("b4").onclick = function() { tab(4); };
 e("b5").onclick = function() { tab(5); };
 
 e("iMyAv").onchange = function() {
-  var f = this.files && this.files;
+  var f = getFirstFile(this);
   if (!f) return;
   resizeImg(f, function(b64) {
     db.u.forEach(function(u) { if (u.l === db.cu) u.av = b64; });
@@ -392,7 +397,7 @@ e("iMyAv").onchange = function() {
 
 var editAvTarget = null;
 e("updAv").onchange = function() {
-  var f = this.files && this.files;
+  var f = getFirstFile(this);
   if (!f || !editAvTarget) return;
   resizeImg(f, function(b64) {
     if (editAvTarget.type === "u" && db.u[editAvTarget.idx]) db.u[editAvTarget.idx].av = b64;
@@ -419,7 +424,7 @@ e("aU").onclick = function() {
   var ex = 0;
   db.u.forEach(function(u) { if (u.l === l) ex = 1; });
   if (ex) return nf("Логин занят");
-  var f = e("nAv").files && e("nAv").files;
+  var f = getFirstFile(e("nAv"));
   resizeImg(f, function(b64) {
     db.u.push({ l: l, p: p, av: b64 });
     e("nL").value = ""; e("nP").value = ""; e("nAv").value = "";
@@ -430,7 +435,7 @@ e("aU").onclick = function() {
 e("aB").onclick = function() {
   var v = e("iBK").value.trim(), p = e("iBP").value.trim();
   if (!v) return nf("Введите ФИО ученика");
-  var f = e("iBAv").files && e("iBAv").files;
+  var f = getFirstFile(e("iBAv"));
   resizeImg(f, function(b64) {
     db.b.push({ id: Date.now(), n: v, p: p, av: b64 });
     e("iBK").value = ""; e("iBP").value = ""; e("iBAv").value = "";
